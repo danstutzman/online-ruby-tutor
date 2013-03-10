@@ -29,8 +29,8 @@
   }
 
   $(document).ready(function() {
-    var userCodeDiv = $('#user_code_div')[0];
-    userCodeCodeMirror = CodeMirror(userCodeDiv, {
+    var textarea = $('#user_code_textarea')[0];
+    userCodeCodeMirror = CodeMirror.fromTextArea(textarea, {
       mode: 'ruby',
       lineNumbers: true,
       tabSize: 2,
@@ -39,8 +39,6 @@
       extraKeys: {Tab: function(cm) {cm.replaceSelection("  ", "end");}},
       autofocus: true
     });
-    userCodeCodeMirror.setValue($('#user_code_textarea').text());
-    $('#user_code_textarea').hide();
 
     if (typeof trace_json !== "undefined") {
       var trace = $.parseJSON(trace_json);
@@ -72,11 +70,6 @@
         userCodeCodeMirror.focus();
       });
     }
-
-    $('form').submit(function(event) {
-      var userCode = userCodeCodeMirror.getValue();
-      $('#user_code_textarea').attr('value', userCode);
-    });
 
     $('#submit_code').removeAttr('disabled');
   });
