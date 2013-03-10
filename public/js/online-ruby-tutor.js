@@ -76,3 +76,9 @@
     $('#submit_code').removeAttr('disabled');
   });
 })();
+
+function assert(cond) {
+  if (!cond) {
+    throw new Error('Assertion Failure');
+  }
+}
