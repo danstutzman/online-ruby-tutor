@@ -18,6 +18,8 @@
           labelNode.nodeValue = "Hash";
         } else if (labelText === "list") {
           labelNode.nodeValue = "Array";
+        } else if (labelText === "function") {
+          labelNode.nodeValue = "Proc";
         }
       }
     });

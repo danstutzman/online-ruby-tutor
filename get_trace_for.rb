@@ -52,7 +52,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     def represent_value(value, heap)
       if [Fixnum, NilClass, String, Symbol, TrueClass, FalseClass].include?(value.class)
         return value
-      elsif [Array, Hash].include?(value.class)
+      elsif [Array, Hash, Proc].include?(value.class)
         on_heap = case value
           when Array
             ["LIST"] + value.map { |element|
@@ -63,6 +63,8 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
               [represent_value(key, heap),
                represent_value(val, heap)]
             }
+          when Proc
+            ["FUNCTION", "line #{value.source_location[1]}", nil]
         end
         heap[value.object_id] = on_heap
         return ['REF', value.object_id]
