@@ -15,6 +15,6 @@ end
 
 post '/' do
   user_code = params['user_code_textarea']
-  @trace = get_trace_for(user_code)
+  @trace = JSON.dump(get_trace_for(user_code))
   haml :index
 end

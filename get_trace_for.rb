@@ -1,5 +1,5 @@
-require 'json'
 require 'pp'
+require 'stringio'
 
 $___default_global_variables = [
   :$;, :$-F, :$@, :$!, :$SAFE, :$~, :$&, :$`, :$', :$+, :$=, :$KCODE, :$-K, :$,, :$/, :$-0, :$\, :$_, :$stdin, :$stdout, :$stderr, :$>, :$<, :$., :$FILENAME, :$-i, :$*, :$?, :$$, :$:, :$-I, :$LOAD_PATH, :$", :$LOADED_FEATURES, :$VERBOSE, :$-v, :$-w, :$-W, :$DEBUG, :$-d, :$0, :$PROGRAM_NAME, :$-p, :$-l, :$-a, :$binding, :$1, :$2, :$3, :$4, :$5, :$6, :$7, :$8, :$9,
@@ -115,7 +115,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
   
     trace = {
       'ordered_globals' => globals,
-      'stdout' => $stdout.string.clone,
+      'stdout' => $stdout.respond_to?(:string) ? $stdout.string.clone : nil,
       'func_name' => 'main',
       'stack_to_render' => $___stack_to_render.map { |frame| frame.clone },
       'globals' => global_values,
@@ -135,7 +135,7 @@ ensure
   $stdout = STDOUT
 end
 
-def get_trace_for(___user_code)
+def get_trace_for(___user_code, ___should_capture_stdout=true)
   $___traces = []
   $___max_frame_id = 0
   $___stack_to_render = [{
@@ -160,7 +160,11 @@ def get_trace_for(___user_code)
   begin
     $___first_line = true
     set_trace_func $___trace_func
-    capture_stdout do
+    if ___should_capture_stdout
+      capture_stdout do
+        eval(___user_code + "\n''")
+      end
+    else
       eval(___user_code + "\n''")
     end
   ensure
@@ -177,5 +181,14 @@ def get_trace_for(___user_code)
     'code' => ___user_code + "\n''",
     'trace' => $___traces,
   }
-  JSON.dump(___all)
+  ___all
+end
+
+if $0 == "get_trace_for.rb"
+  pp get_trace_for("
+b = lambda { |x|
+  x + 3
+}
+puts b.call(5)
+", false)
 end
