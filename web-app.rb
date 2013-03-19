@@ -20,8 +20,17 @@ set :public_folder, 'public'
 set :static_cache_control, [:public, :no_cache]
 set :haml, { :format => :html5, :escape_html => true, :ugly => true }
 
+def authenticated?
+  user_id = session[:google_plus_user_id]
+  user_id && CONFIG['AUTHORIZED_GOOGLE_PLUS_UIDS'].include?(user_id)
+end
+
 get '/' do
-  haml :index
+  if authenticated?
+    haml :index
+  else
+    haml :login
+  end
 end
 
 post '/' do
@@ -52,15 +61,16 @@ get '/auth/google_oauth2/callback' do
   response = request.env['omniauth.auth']
   uid = response['uid']
   if CONFIG['AUTHORIZED_GOOGLE_PLUS_UIDS'].include?(uid)
-    'success'
+    session[:google_plus_user_id] = uid
+    redirect "/"
   else
-    'failed'
+    redirect "/auth/failure?message=Sorry,+you're+not+on+the+list.+Contact+dtstutz@gmail.com+to+be+added."
   end
 end
 
 get '/auth/failure' do
-  message = params['message']
-  message
+  @auth_failure_message = params['message']
+  haml :login
 end
 
 # http://localhost:4567/auth/google_oauth2
