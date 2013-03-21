@@ -54,7 +54,7 @@
         }
       };
       var visualizer = new ExecutionVisualizer('trace_render_div', trace, {
-        embeddedMode: true,
+        embeddedMode: false,
         heightChangeCallback: redrawAllVisualizerArrows,
         editCodeBaseURL: null
       });
