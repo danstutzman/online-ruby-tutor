@@ -173,6 +173,7 @@ def get_trace_for(___user_code)
   $___num_instructions_so_far = 0
   Thread.start {
     exception_frame = nil
+    $0 = $PROGRAM_NAME = "ruby" # for security
     begin
       ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
       #puts ___user_code
