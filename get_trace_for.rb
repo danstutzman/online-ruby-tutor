@@ -34,6 +34,12 @@ $___NUM_SUFFIX_LINES = $___SUFFIX.split("\n").size
 $___trace_func = proc { |event, file, line, id, binding, classname|
   #p [event, file, line, id]
 
+  $___num_instructions_so_far += 1
+  if $___num_instructions_so_far >= $___MAX_INSTRUCTIONS_LIMIT
+    set_trace_func nil
+    raise InstructionLimitReached
+  end
+
   $___stack_to_render = $___stack_to_render[0..$___max_frame_id]
 
   if event == 'call' && file == '(eval)'
@@ -114,11 +120,6 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     end
   
     if line > $___NUM_PREFIX_LINES && (line - $___NUM_PREFIX_LINES <= ($___user_code_num_lines + 2))
-      $___num_instructions_so_far += 1
-      if $___num_instructions_so_far >= $___MAX_INSTRUCTIONS_LIMIT
-        raise InstructionLimitReached
-      end
-
       trace = {
         'ordered_globals' => [],
         'stdout' => stdout.string.clone,
