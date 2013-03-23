@@ -157,38 +157,33 @@ def ___get_trace_for_internal(___user_code)
   ensure
     set_trace_func nil
   end
-
-  ___all = {
-    'code' => ___user_code + "\n''",
-    'trace' => $___traces,
-  }
-  ___all
+  nil
 end
 
 def get_trace_for(___user_code)
   $___accum_stdout = ""
   $___user_code_num_lines = ___user_code.split("\n").size
   Thread.start {
+    exception_frame = nil
     begin
       ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
       #puts ___user_code
       ___get_trace_for_internal(___user_code_changed)
-    rescue SecurityError => e
-      line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
-      {
-        'code' => ___user_code,
-        'trace' => [
-          {
-            'ordered_globals' => [],
-            'stack_to_render' => [],
-            'exception_msg' => "#{e} (#{e.class})",
-            'line' => line_num,
-            'event' => 'uncaught_exception',
-            'offset' => 21
-          }
-        ],
-      }
+    rescue => e
+      line_num = nil
+      if e.backtrace && e.backtrace[1]
+        line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
+      end
+      exception_frame = $___traces.last.clone || {}
+      exception_frame['exception_msg'] = "#{e} (#{e.class})"
+      exception_frame['line'] = line_num
+      exception_frame['event'] = 'uncaught_exception'
+      exception_frame['offset'] = 1
     end
+    {
+      'code' => ___user_code + "\n''",
+      'trace' => $___traces + (exception_frame ? [exception_frame] : []),
+    }
   }.value
 end
 
