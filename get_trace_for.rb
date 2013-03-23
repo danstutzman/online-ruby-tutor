@@ -1,6 +1,11 @@
 require 'pp'
 require 'stringio'
 
+class InstructionLimitReached < Exception
+end
+
+$___MAX_INSTRUCTIONS_LIMIT = 300
+
 $___PREFIX = "
 $___to_output = []
 $___to_output.untrust
@@ -109,6 +114,11 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     end
   
     if line > $___NUM_PREFIX_LINES && (line - $___NUM_PREFIX_LINES <= ($___user_code_num_lines + 2))
+      $___num_instructions_so_far += 1
+      if $___num_instructions_so_far >= $___MAX_INSTRUCTIONS_LIMIT
+        raise InstructionLimitReached
+      end
+
       trace = {
         'ordered_globals' => [],
         'stdout' => stdout.string.clone,
@@ -161,14 +171,19 @@ def ___get_trace_for_internal(___user_code)
 end
 
 def get_trace_for(___user_code)
-  $___accum_stdout = ""
   $___user_code_num_lines = ___user_code.split("\n").size
+  $___num_instructions_so_far = 0
   Thread.start {
     exception_frame = nil
     begin
       ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
       #puts ___user_code
       ___get_trace_for_internal(___user_code_changed)
+    rescue InstructionLimitReached => e
+      exception_frame = {
+        'exception_msg' => "(stopped after #{$___MAX_INSTRUCTIONS_LIMIT} steps to prevent possible infinite loop)",
+        'event' => 'instruction_limit_reached',
+      }
     rescue => e
       line_num = nil
       if e.backtrace && e.backtrace[1]
@@ -201,7 +216,6 @@ b = lambda { |x|
 def f(x)
 end
 puts f(5)
-`ls`
 puts b.call(5)
 ")
 end
