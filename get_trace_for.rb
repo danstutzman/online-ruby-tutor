@@ -1,10 +1,12 @@
 require 'pp'
 require 'stringio'
+require 'timeout'
 
 class InstructionLimitReached < Exception
 end
 
 $___MAX_INSTRUCTIONS_LIMIT = 300
+$___MAX_SECONDS_TO_COMPLETE = 1
 
 $___PREFIX = "
 $___to_output = []
@@ -17,7 +19,6 @@ module Kernel
   def puts( *___args); $___output.call(:puts,  *___args); end
   def p(    *___args); $___output.call(:p,     *(___args.map { |___arg| ___arg.inspect })); end
   def print(*___args); $___output.call(:print, *___args); end
-  def sleep(*___args); end
 end
 module UserCode
 end
@@ -171,34 +172,42 @@ end
 def get_trace_for(___user_code)
   $___user_code_num_lines = ___user_code.split("\n").size
   $___num_instructions_so_far = 0
-  Thread.start {
-    exception_frame = nil
-    $0 = $PROGRAM_NAME = "ruby" # for security
-    begin
-      ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
-      #puts ___user_code
-      ___get_trace_for_internal(___user_code_changed)
-    rescue InstructionLimitReached => e
-      exception_frame = {
-        'exception_msg' => "(stopped after #{$___MAX_INSTRUCTIONS_LIMIT} steps to prevent possible infinite loop)",
-        'event' => 'instruction_limit_reached',
-      }
-    rescue StandardError, SecurityError => e
-      line_num = nil
-      if e.backtrace && e.backtrace[1]
-        line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
-      end
-      exception_frame = $___traces.last.clone || {}
-      exception_frame['exception_msg'] = "#{e} (#{e.class})"
-      exception_frame['line'] = line_num
-      exception_frame['event'] = 'uncaught_exception'
-      exception_frame['offset'] = 1
+  exception_frame = nil
+  begin
+    Timeout::timeout($___MAX_SECONDS_TO_COMPLETE) do
+      Thread.start {
+        $0 = $PROGRAM_NAME = "ruby" # for security
+        ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
+        #puts ___user_code
+        ___get_trace_for_internal(___user_code_changed)
+      }.value
     end
-    {
-      'code' => ___user_code + "\n''",
-      'trace' => $___traces + (exception_frame ? [exception_frame] : []),
+  rescue Timeout::Error => e
+    set_trace_func nil
+    exception_frame = {
+      'exception_msg' => "(timeout)",
+      'event' => 'instruction_limit_reached',
     }
-  }.value
+  rescue InstructionLimitReached => e
+    exception_frame = {
+      'exception_msg' => "(stopped after #{$___MAX_INSTRUCTIONS_LIMIT} steps to prevent possible infinite loop)",
+      'event' => 'instruction_limit_reached',
+    }
+  rescue StandardError, SecurityError => e
+    line_num = nil
+    if e.backtrace && e.backtrace[1]
+      line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
+    end
+    exception_frame = $___traces.last.clone || {}
+    exception_frame['exception_msg'] = "#{e} (#{e.class})"
+    exception_frame['line'] = line_num
+    exception_frame['event'] = 'uncaught_exception'
+    exception_frame['offset'] = 1
+  end
+  {
+    'code' => ___user_code + "\n''",
+    'trace' => $___traces + (exception_frame ? [exception_frame] : []),
+  }
 end
 
 if $0 == "get_trace_for.rb"
