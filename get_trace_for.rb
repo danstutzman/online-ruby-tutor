@@ -1,24 +1,36 @@
 require 'pp'
 require 'stringio'
 
-$___default_global_variables = [
-  :$;, :$-F, :$@, :$!, :$SAFE, :$~, :$&, :$`, :$', :$+, :$=, :$KCODE, :$-K, :$,, :$/, :$-0, :$\, :$_, :$stdin, :$stdout, :$stderr, :$>, :$<, :$., :$FILENAME, :$-i, :$*, :$?, :$$, :$:, :$-I, :$LOAD_PATH, :$", :$LOADED_FEATURES, :$VERBOSE, :$-v, :$-w, :$-W, :$DEBUG, :$-d, :$0, :$PROGRAM_NAME, :$-p, :$-l, :$-a, :$binding, :$1, :$2, :$3, :$4, :$5, :$6, :$7, :$8, :$9,
-
- :$fileutils_rb_have_lchmod,
- :$fileutils_rb_have_lchown,
- :$CODERAY_DEBUG,
- :$rdebug_state,
- :$__dbg_interface,
- :$rdebug_in_irb,
- :$CGI_ENV,
-]
-$___global_variables_from_previous_execution = []
-
-def pay_attention_to(___new_global)
-  proc { |_ignored|
-      $___global_variables_from_previous_execution.delete(___new_global)
-  }
+$___PREFIX = "
+$___to_puts = []
+$___to_p = []
+$___to_print = []
+$___to_puts.untrust
+$___to_p.untrust
+$___to_print.untrust
+$___puts  = proc { |*args| $___to_puts  += [args]; nil }
+$___p     = proc { |*args| $___to_p     += [args]; nil }
+$___print = proc { |*args| $___to_print += [args]; nil }
+module Kernel
+  def puts( *args); $___puts.call( *args); end
+  def p(    *args); $___p.call(    *args); end
+  def print(*args); $___print.call(*args); end
 end
+class UserCode
+end
+UserCode.untrust
+$SAFE = 4
+class UserCode
+  def ___go
+"
+$___NUM_PREFIX_LINES = $___PREFIX.split("\n").size
+$___SUFFIX = "
+''
+end
+end
+UserCode.new.___go
+"
+$___NUM_SUFFIX_LINES = $___SUFFIX.split("\n").size
 
 $___trace_func = proc { |event, file, line, id, binding, classname|
   #p [event, file, line, id]
@@ -64,7 +76,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
                represent_value(val, heap)]
             }
           when Proc
-            ["FUNCTION", "line #{value.source_location[1]}", nil]
+            ["FUNCTION", "line #{value.source_location[1] - $___NUM_PREFIX_LINES}", nil]
         end
         heap[value.object_id] = on_heap
         return ['REF', value.object_id]
@@ -82,48 +94,34 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
       local_values[local_name.to_s] = represent_value(value, heap)
     end
 
-    if $___first_line
-      for ___new_global in (global_variables -
-          $___global_variables_from_previous_execution -
-          $___default_global_variables)
-        $___global_variables_from_previous_execution.push(___new_global)
-        if !___new_global.to_s.start_with?('$___')
-          trace_var ___new_global, pay_attention_to(___new_global)
-        end
-      end
-      $___first_line = false
-    end
-
-    globals = binding.eval('global_variables')
-    global_values = {}
-    globals.reject! { |global|
-      global.to_s.start_with?('$___') ||
-      $___global_variables_from_previous_execution.include?(global) ||
-      $___default_global_variables.include?(global)
-    }
-    globals.each do |global_name|
-      value = binding.eval(global_name.to_s)
-      global_values[global_name.to_s] = represent_value(value, heap)
-    end
-
     if $___stack_to_render.last
       $___stack_to_render.last['encoded_locals'] = local_values.clone
       $___stack_to_render.last['ordered_varnames'] = locals.clone
       $___stack_to_render.last['is_highlighted'] = (event == 'call')
       $___stack_to_render.last['unique_hash'] = id.to_s
     end
+
+    stdout = StringIO.new
+    to_write_out = (binding.eval("$___to_puts") rescue nil) || []
+    to_write_out.each { |to_write| stdout.puts(*to_write) }
+    to_write_out = (binding.eval("$___to_p") rescue nil) || []
+    to_write_out.each { |to_write| stdout.puts(*(to_write.map { |thing| thing.inspect })) }
+    to_write_out = (binding.eval("$___to_print") rescue nil) || []
+    to_write_out.each { |to_write| stdout.print(*to_write) }
   
-    trace = {
-      'ordered_globals' => globals,
-      'stdout' => $stdout.respond_to?(:string) ? $stdout.string.clone : nil,
-      'func_name' => 'main',
-      'stack_to_render' => $___stack_to_render.map { |frame| frame.clone },
-      'globals' => global_values,
-      'heap' => heap,
-      'line' => line,
-      'event' => 'step_line',
-    }
-    $___traces.push trace
+    if line > $___NUM_PREFIX_LINES && (line - $___NUM_PREFIX_LINES <= ($___user_code_num_lines + 2))
+      trace = {
+        'ordered_globals' => [],
+        'stdout' => stdout.string.clone,
+        'func_name' => 'main',
+        'stack_to_render' => $___stack_to_render.map { |frame| frame.clone },
+        'globals' => {},
+        'heap' => heap,
+        'line' => line - $___NUM_PREFIX_LINES,
+        'event' => 'step_line',
+      }
+      $___traces.push trace
+    end
   end
 }
 
@@ -135,7 +133,7 @@ ensure
   $stdout = STDOUT
 end
 
-def get_trace_for(___user_code, ___should_capture_stdout=true)
+def ___get_trace_for_internal(___user_code)
   $___traces = []
   $___max_frame_id = 0
   $___stack_to_render = [{
@@ -150,32 +148,16 @@ def get_trace_for(___user_code, ___should_capture_stdout=true)
     "ordered_varnames" => nil, # fill out
   }]
 
-  ___globals_before = global_variables
-  for ___old_global in $___global_variables_from_previous_execution
-    if !___old_global.to_s.start_with?('$___')
-      trace_var ___old_global, pay_attention_to(___old_global)
-    end
-  end
-
   begin
-    $___first_line = true
     set_trace_func $___trace_func
-    if ___should_capture_stdout
-      capture_stdout do
-        eval(___user_code + "\n''")
-      end
-    else
-      eval(___user_code + "\n''")
+    $___stdout_accum = [].taint
+    def ___puts(*args)
+      $___stdout_accum.push args
     end
+    eval($___PREFIX + ___user_code + $___SUFFIX)
   ensure
     set_trace_func nil
   end
-
-  for ___old_global in $___global_variables_from_previous_execution
-    untrace_var ___old_global
-  end
-  $___global_variables_from_previous_execution +=
-    global_variables - ___globals_before
 
   ___all = {
     'code' => ___user_code + "\n''",
@@ -184,11 +166,19 @@ def get_trace_for(___user_code, ___should_capture_stdout=true)
   ___all
 end
 
+def get_trace_for(___user_code)
+  $___accum_stdout = ""
+  $___user_code_num_lines = ___user_code.split("\n").size
+  Thread.start {
+    ___get_trace_for_internal(___user_code)
+  }.value
+end
+
 if $0 == "get_trace_for.rb"
   pp get_trace_for("
 b = lambda { |x|
   x + 3
 }
 puts b.call(5)
-", false)
+")
 end
