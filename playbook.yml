@@ -29,6 +29,7 @@
   - command: sh -c "if [ -e tmp/pids/unicorn.pid ]; then cat tmp/pids/unicorn.pid | xargs kill; rm tmp/pids/unicorn.pid; fi" chdir=/home/deployer/online-ruby-tutor
   - command: "bundle exec unicorn -c unicorn.rb -E production -D -l 0.0.0.0:3001 chdir=/home/deployer/online-ruby-tutor"
 
+  - copy: src=config.yaml dest=/home/deployer/online-ruby-tutor/config.yaml
 
 - hosts: web
   user: root
