@@ -184,7 +184,7 @@ def get_trace_for(___user_code)
         'exception_msg' => "(stopped after #{$___MAX_INSTRUCTIONS_LIMIT} steps to prevent possible infinite loop)",
         'event' => 'instruction_limit_reached',
       }
-    rescue => e
+    rescue StandardError, SecurityError => e
       line_num = nil
       if e.backtrace && e.backtrace[1]
         line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
