@@ -17,6 +17,7 @@ module Kernel
   def puts( *___args); $___output.call(:puts,  *___args); end
   def p(    *___args); $___output.call(:p,     *(___args.map { |___arg| ___arg.inspect })); end
   def print(*___args); $___output.call(:print, *___args); end
+  def sleep(*___args); end
 end
 module UserCode
 end
