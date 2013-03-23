@@ -1,6 +1,6 @@
 # set path to app that will be used to configure unicorn, 
 # note the trailing slash in this example
-@dir = "/root/online-ruby-tutor/"
+@dir = "/home/deployer/online-ruby-tutor/"
 
 worker_processes 1
 working_directory @dir
