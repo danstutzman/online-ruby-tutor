@@ -160,10 +160,6 @@ def ___get_trace_for_internal(___user_code)
 
   begin
     set_trace_func $___trace_func
-    $___stdout_accum = [].taint
-    def ___puts(*args)
-      $___stdout_accum.push args
-    end
     eval($___PREFIX + ___user_code + $___SUFFIX)
   ensure
     set_trace_func nil
