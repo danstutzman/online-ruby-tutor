@@ -2,19 +2,16 @@ require 'pp'
 require 'stringio'
 
 $___PREFIX = "
-$___to_puts = []
-$___to_p = []
-$___to_print = []
-$___to_puts.untrust
-$___to_p.untrust
-$___to_print.untrust
-$___puts  = proc { |*args| $___to_puts  += [args]; nil }
-$___p     = proc { |*args| $___to_p     += [args]; nil }
-$___print = proc { |*args| $___to_print += [args]; nil }
+$___to_output = []
+$___to_output.untrust
+$___output = proc { |which_output, *args|
+  $___to_output += [[which_output, args]]
+  nil
+}
 module Kernel
-  def puts( *args); $___puts.call( *args); end
-  def p(    *args); $___p.call(    *args); end
-  def print(*args); $___print.call(*args); end
+  def puts( *args); $___output.call(:puts,  *args); end
+  def p(    *args); $___output.call(:p,     *args); end
+  def print(*args); $___output.call(:print, *args); end
 end
 class UserCode
 end
@@ -102,12 +99,18 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     end
 
     stdout = StringIO.new
-    to_write_out = (binding.eval("$___to_puts") rescue nil) || []
-    to_write_out.each { |to_write| stdout.puts(*to_write) }
-    to_write_out = (binding.eval("$___to_p") rescue nil) || []
-    to_write_out.each { |to_write| stdout.puts(*(to_write.map { |thing| thing.inspect })) }
-    to_write_out = (binding.eval("$___to_print") rescue nil) || []
-    to_write_out.each { |to_write| stdout.print(*to_write) }
+    to_write_out = (binding.eval("$___to_output") rescue nil) || []
+    to_write_out.each do |which_output_and_args|
+      which_output, args = which_output_and_args
+      if which_output == :puts
+        stdout.puts(*args)
+      elsif which_output == :p
+        args_inspect = args.map { |arg| arg.inspect }
+        stdout.puts(*args_inspect)
+      elsif which_output == :print
+        stdout.print(*args)
+      end
+    end
   
     if line > $___NUM_PREFIX_LINES && (line - $___NUM_PREFIX_LINES <= ($___user_code_num_lines + 2))
       trace = {
