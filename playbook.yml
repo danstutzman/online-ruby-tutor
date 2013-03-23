@@ -7,11 +7,14 @@
   - command: cp /root/.ssh/authorized_keys /home/deployer/.ssh/authorized_keys
   - command: chown deployer:deployer /home/deployer/.ssh/authorized_keys
   - command: chmod 0600 /home/deployer/.ssh/authorized_keys
+
   - command: apt-get update
+
   - apt: "pkg=ruby1.9.3"
   - apt: "pkg=nginx"
   - apt: "pkg=git"
   - apt: "pkg=make"
+
   - command: gem install bundler creates=/usr/local/bin/bundle
 
 - hosts: web
@@ -24,7 +27,8 @@
   - command: "git submodule init chdir=/home/deployer/online-ruby-tutor"
   - command: "git submodule update chdir=/home/deployer/online-ruby-tutor"
   - command: sh -c "if [ -e tmp/pids/unicorn.pid ]; then cat tmp/pids/unicorn.pid | xargs kill; rm tmp/pids/unicorn.pid; fi" chdir=/home/deployer/online-ruby-tutor
-  - command: "bundle exec unicorn -c unicorn.rb -E development -D -l 0.0.0.0:3001 chdir=/home/deployer/online-ruby-tutor"
+  - command: "bundle exec unicorn -c unicorn.rb -E production -D -l 0.0.0.0:3001 chdir=/home/deployer/online-ruby-tutor"
+
 
 - hosts: web
   user: root
