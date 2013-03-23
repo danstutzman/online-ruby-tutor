@@ -9,23 +9,20 @@ $___output = proc { |which_output, *args|
   nil
 }
 module Kernel
-  def puts( *args); $___output.call(:puts,  *args); end
-  def p(    *args); $___output.call(:p,     *args); end
-  def print(*args); $___output.call(:print, *args); end
+  def puts( *___args); $___output.call(:puts,  *___args); end
+  def p(    *___args); $___output.call(:p,     *(___args.map { |___arg| ___arg.inspect })); end
+  def print(*___args); $___output.call(:print, *___args); end
 end
-class UserCode
+module UserCode
 end
 UserCode.untrust
 $SAFE = 4
-class UserCode
-  def ___go
+module UserCode
 "
 $___NUM_PREFIX_LINES = $___PREFIX.split("\n").size
 $___SUFFIX = "
 ''
 end
-end
-UserCode.new.___go
 "
 $___NUM_SUFFIX_LINES = $___SUFFIX.split("\n").size
 
@@ -78,7 +75,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
         heap[value.object_id] = on_heap
         return ['REF', value.object_id]
       else
-        puts "Don't know type #{value.class}"
+        #puts "Don't know type #{value.class}"
         value.class.to_s
       end
     end
@@ -105,8 +102,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
       if which_output == :puts
         stdout.puts(*args)
       elsif which_output == :p
-        args_inspect = args.map { |arg| arg.inspect }
-        stdout.puts(*args_inspect)
+        stdout.puts(*args)
       elsif which_output == :print
         stdout.print(*args)
       end
@@ -173,15 +169,44 @@ def get_trace_for(___user_code)
   $___accum_stdout = ""
   $___user_code_num_lines = ___user_code.split("\n").size
   Thread.start {
-    ___get_trace_for_internal(___user_code)
+    begin
+      ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
+      #puts ___user_code
+      ___get_trace_for_internal(___user_code_changed)
+    rescue SecurityError => e
+      line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
+      {
+        'code' => ___user_code,
+        'trace' => [
+          {
+            'ordered_globals' => [],
+            'stack_to_render' => [],
+            'exception_msg' => "#{e} (#{e.class})",
+            'line' => line_num,
+            'event' => 'uncaught_exception',
+            'offset' => 21
+          }
+        ],
+      }
+    end
   }.value
 end
 
 if $0 == "get_trace_for.rb"
   pp get_trace_for("
+class A
+  def inspect
+    \"test\"
+  end
+end
+p A.new
 b = lambda { |x|
   x + 3
 }
+def f(x)
+end
+puts f(5)
+`ls`
 puts b.call(5)
 ")
 end
