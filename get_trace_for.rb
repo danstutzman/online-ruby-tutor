@@ -28,7 +28,6 @@ module UserCode
 "
 $___NUM_PREFIX_LINES = $___PREFIX.split("\n").size
 $___SUFFIX = "
-''
 end
 "
 $___NUM_SUFFIX_LINES = $___SUFFIX.split("\n").size
@@ -64,7 +63,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     # trim it next time
   end
 
-  if (event == 'line' || event == 'call' || event == 'return') && file == '(eval)'
+  if (event == 'line' || event == 'call' || event == 'return' || event == 'end') && file == '(eval)'
     #printf "%8s %s:%-2d %10s %8s\n", event, file, line, id, classname
     
     heap = {}
@@ -121,7 +120,8 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
       end
     end
   
-    if line > $___NUM_PREFIX_LINES && (line - $___NUM_PREFIX_LINES <= ($___user_code_num_lines + 2))
+    num_lines_over = (line - $___NUM_PREFIX_LINES) - $___user_code_num_lines
+    if line > $___NUM_PREFIX_LINES && num_lines_over <= 1
       trace = {
         'ordered_globals' => [],
         'stdout' => stdout.string.clone,
@@ -129,7 +129,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
         'stack_to_render' => $___stack_to_render.map { |frame| frame.clone },
         'globals' => {},
         'heap' => heap,
-        'line' => line - $___NUM_PREFIX_LINES,
+        'line' => (num_lines_over > 0) ? $___user_code_num_lines : (line - $___NUM_PREFIX_LINES),
         'event' => 'step_line',
       }
       $___traces.push trace
