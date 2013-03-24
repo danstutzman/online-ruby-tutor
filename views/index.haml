@@ -33,11 +33,52 @@
         opacity:0.1;
         display:none;
       }
+      table {
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th, td {
+        padding: 0px 5px;
+      }
+      body {
+        font-family: sans-serif;
+      }
+      tr.headers {
+        background-color: gray;
+        color: white;
+      }
 
   %body
     %script
       != "var returned = $.parseJSON(#{JSON.dump([@trace['returned']]).inspect})[0];"
       = "console.log(returned);"
+    - if @exercise
+      %b
+        Exercise
+        = "#{params['exercise_num']}:"
+        = @exercise['description']
+      %br
+      %table
+        %tr.headers
+          %th Given
+          %th Expected
+          %th Actual
+          %th Result
+          %th
+        - @exercise['cases'].each_with_index do |_case, i|
+          %tr
+            %td
+              %code= _case['given']
+            %td
+              %code= _case['expected']
+            %td
+              %code nil
+            %td
+              %div(style='color:red;display:inline-block;width:60px') FAILED
+            - if i == 0
+              %td{ :rowspan => @exercise['cases'].size }
+                %button(style='height:100%') Run
+
     %form(method='POST' action='/')
       #user_code_div
         %textarea#user_code_textarea(name='user_code_textarea'

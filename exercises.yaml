@@ -1,0 +1,7 @@
+"1":
+  description: "You're given an integer; add one to it"
+  cases:
+  - given: a = 3
+    expected: 4
+  - given: a = 4
+    expected: 5

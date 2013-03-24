@@ -10,6 +10,9 @@ require './get_trace_for.rb'
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
 CONFIG = YAML.load_file(config_path)
 
+exercises_path = File.join(File.dirname(__FILE__), 'exercises.yaml')
+EXERCISES = YAML.load_file(exercises_path)
+
 use Rack::Session::Cookie, {
   :key => 'rack.session',
   :secret => CONFIG['COOKIE_SIGNING_SECRET'],
@@ -73,4 +76,13 @@ get '/auth/failure' do
   haml :login
 end
 
-# http://localhost:4567/auth/google_oauth2
+get '/exercise/:exercise_num' do
+  if authenticated?
+    @exercise = EXERCISES[params['exercise_num']]
+    user_code = params['user_code_textarea']
+    @trace = get_trace_for(user_code)
+    haml :index
+  else
+    haml :login
+  end
+end
