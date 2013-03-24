@@ -17,7 +17,7 @@
 
     - if @trace
       %script
-        != "var trace_json = #{@trace.inspect};"
+        != "var trace_json = #{JSON.dump(@trace).inspect};"
 
     %script(src='js/online-ruby-tutor.js')
     :css
@@ -35,6 +35,9 @@
       }
 
   %body
+    %script
+      != "var returned = $.parseJSON(#{JSON.dump([@trace['returned']]).inspect})[0];"
+      = "console.log(returned);"
     %form(method='POST' action='/')
       #user_code_div
         %textarea#user_code_textarea(name='user_code_textarea'

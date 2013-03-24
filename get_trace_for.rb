@@ -166,7 +166,6 @@ def ___get_trace_for_internal(___user_code)
   ensure
     set_trace_func nil
   end
-  nil
 end
 
 def get_trace_for(___user_code)
@@ -174,8 +173,9 @@ def get_trace_for(___user_code)
   $___num_instructions_so_far = 0
   exception_frame = nil
   begin
+    returned = nil
     Timeout::timeout($___MAX_SECONDS_TO_COMPLETE) do
-      Thread.start {
+      returned = Thread.start {
         $0 = $PROGRAM_NAME = "ruby" # for security
         ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
         #puts ___user_code
@@ -205,8 +205,9 @@ def get_trace_for(___user_code)
     exception_frame['offset'] = 1
   end
   {
-    'code' => ___user_code + "\n''",
+    'code' => ___user_code,
     'trace' => $___traces + (exception_frame ? [exception_frame] : []),
+    'returned' => returned,
   }
 end
 
