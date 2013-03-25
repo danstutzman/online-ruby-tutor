@@ -1,3 +1,10 @@
+// Overwrite assert so we get a stack trace not just a message
+function assert(cond) {
+  if (!cond) {
+    throw new Error('Assertion Failure');
+  }
+}
+
 (function() {
   var userCodeCodeMirror = null;
 
@@ -92,9 +99,3 @@
     }
   });
 })();
-
-function assert(cond) {
-  if (!cond) {
-    throw new Error('Assertion Failure');
-  }
-}
