@@ -42,22 +42,29 @@
       autofocus: true
     });
 
-    if (typeof trace_json !== "undefined") {
-      var trace = $.parseJSON(trace_json);
-      var visualizer = null;
-      var redrawAllVisualizerArrows = function() {
-        // Take advantage of the callback to convert some Python things to Ruby
-        changePythonToRuby();
+    if (typeof traces_json !== "undefined") {
+      var traces = $.parseJSON(traces_json);
+      var setupVisualizer = function(i) {
+        var visualizer = null;
+        var redrawAllVisualizerArrows = function() {
+          // Take advantage of the callback to convert some Python things to Ruby
+          changePythonToRuby();
 
-        if (visualizer) {
-          visualizer.redrawConnectors();
-        }
+          if (visualizer) {
+            visualizer.redrawConnectors();
+          }
+        };
+        var visualizer = new ExecutionVisualizer(
+          'trace_render_div' + i, traces[i], {
+            embeddedMode: false,
+            heightChangeCallback: redrawAllVisualizerArrows,
+            editCodeBaseURL: null
+          });
       };
-      var visualizer = new ExecutionVisualizer('trace_render_div', trace, {
-        embeddedMode: false,
-        heightChangeCallback: redrawAllVisualizerArrows,
-        editCodeBaseURL: null
-      });
+      for (var i = 0; i < traces.length; i++) {
+        setupVisualizer(i);
+        $('#trace_render_div' + i).show();
+      }
 
       $('#jmpStepFwd' ).click(function(event) { changePythonToRuby(); });
       $('#jmpStepBack').click(function(event) { changePythonToRuby(); });
@@ -71,9 +78,18 @@
         $('#user_code_div').show();
         userCodeCodeMirror.focus();
       });
-    }
 
-    $('#submit_code').removeAttr('disabled');
+      $('.trace_render_div').hide();
+      $('#traces-table tr').click(function(e) {
+        var tr = $(e.target).closest('tr');
+        var traceNum = tr.attr('data-trace-num');
+        $('.trace_render_div').hide();
+        $('#trace_render_div' + traceNum).show();
+        $('#trace_render_div' + traceNum + ' #jmpLastInstr').trigger('click');
+        $('#traces-table tr').removeClass('selectedRow');
+        tr.addClass('selectedRow');
+      });
+    }
   });
 })();
 

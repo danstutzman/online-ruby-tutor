@@ -26,7 +26,7 @@ UserCode.untrust
 $SAFE = 4
 module UserCode
 "
-$___NUM_PREFIX_LINES = $___PREFIX.split("\n").size
+$___NUM_PREFIX_LINES = $___PREFIX.split("\n").size + 1 # + 1 for assignments
 $___SUFFIX = "
 end
 "
@@ -108,7 +108,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     end
 
     stdout = StringIO.new
-    to_write_out = (binding.eval("$___to_output") rescue nil) || []
+    to_write_out = binding.eval("$___to_output") || []
     to_write_out.each do |which_output_and_args|
       which_output, args = which_output_and_args
       if which_output == :puts
@@ -121,7 +121,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     end
   
     num_lines_over = (line - $___NUM_PREFIX_LINES) - $___user_code_num_lines
-    if line > $___NUM_PREFIX_LINES && num_lines_over <= 1
+    if line > $___NUM_PREFIX_LINES && num_lines_over <= 2
       trace = {
         'ordered_globals' => [],
         'stdout' => stdout.string.clone,
@@ -137,15 +137,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
   end
 }
 
-def capture_stdout
-  $stdout = StringIO.new
-  yield
-  return $stdout.string.clone
-ensure
-  $stdout = STDOUT
-end
-
-def ___get_trace_for_internal(___user_code)
+def ___get_trace_for_internal(___user_code, ___assignments)
   $___traces = []
   $___max_frame_id = 0
   $___stack_to_render = [{
@@ -160,16 +152,23 @@ def ___get_trace_for_internal(___user_code)
     "ordered_varnames" => nil, # fill out
   }]
 
+  ___assignment_line = ___assignments.map { |___assignment_key, ___assignment_value|
+    "#{___assignment_key} = #{___assignment_value.inspect}"
+  }.join('; ') + "\n"
+
   begin
     set_trace_func $___trace_func
-    eval($___PREFIX + ___user_code + $___SUFFIX)
+    puts 'here'
+    i = 0
+    #puts ($___PREFIX + ___assignment_line + ___user_code + $___SUFFIX).split("\n").map { |line| i += 1; sprintf("%02d ", i) + line }.join("\n")
+    eval($___PREFIX + ___assignment_line + ___user_code + $___SUFFIX)
   ensure
     set_trace_func nil
   end
 end
 
-def get_trace_for(___user_code)
-  $___user_code_num_lines = ___user_code.split("\n").size
+def get_trace_for_case(___user_code, ___assignments)
+  $___user_code_num_lines = ___user_code.chomp.split("\n").size
   $___num_instructions_so_far = 0
   exception_frame = nil
   begin
@@ -179,7 +178,7 @@ def get_trace_for(___user_code)
         $0 = $PROGRAM_NAME = "ruby" # for security
         ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
         #puts ___user_code
-        ___get_trace_for_internal(___user_code_changed)
+        ___get_trace_for_internal(___user_code_changed, ___assignments)
       }.value
     end
   rescue Timeout::Error => e
@@ -188,21 +187,24 @@ def get_trace_for(___user_code)
       'exception_msg' => "(timeout)",
       'event' => 'instruction_limit_reached',
     }
+    returned = e
   rescue InstructionLimitReached => e
     exception_frame = {
       'exception_msg' => "(stopped after #{$___MAX_INSTRUCTIONS_LIMIT} steps to prevent possible infinite loop)",
       'event' => 'instruction_limit_reached',
     }
+    returned = e
   rescue StandardError, SecurityError => e
     line_num = nil
     if e.backtrace && e.backtrace[1]
       line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
     end
-    exception_frame = $___traces.last.clone || {}
+    exception_frame = ($___traces.last && $___traces.last.clone) || {}
     exception_frame['exception_msg'] = "#{e} (#{e.class})"
     exception_frame['line'] = line_num
     exception_frame['event'] = 'uncaught_exception'
     exception_frame['offset'] = 1
+    returned = e
   end
   {
     'code' => ___user_code,
@@ -211,20 +213,16 @@ def get_trace_for(___user_code)
   }
 end
 
+def get_trace_for_cases(___user_code, ___cases)
+  ___cases.map { |___assignments|
+    get_trace_for_case(___user_code, ___assignments)
+  }
+end
+
 if $0 == "get_trace_for.rb"
-  pp get_trace_for("
-class A
-  def inspect
-    \"test\"
-  end
-end
-p A.new
-b = lambda { |x|
-  x + 3
-}
-def f(x)
-end
-puts f(5)
-puts b.call(5)
-")
+  pp get_trace_for_cases("
+puts 'a'
+puts 'b'
+puts 'c'
+", [{:a => 3}])
 end

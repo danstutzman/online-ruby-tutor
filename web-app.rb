@@ -28,6 +28,11 @@ def authenticated?
   user_id && CONFIG['AUTHORIZED_GOOGLE_PLUS_UIDS'].include?(user_id)
 end
 
+def match(path, opts={}, &block)
+  get(path, opts, &block)
+  post(path, opts, &block)
+end
+
 get '/' do
   if authenticated?
     haml :index
@@ -38,7 +43,7 @@ end
 
 post '/' do
   user_code = params['user_code_textarea']
-  @trace = get_trace_for(user_code)
+  @traces = get_trace_for_cases(user_code, [{ :a => 1, :b => 2 }, { :a => 3, :c => 4 }])
   haml :index
 end
 
@@ -76,11 +81,14 @@ get '/auth/failure' do
   haml :login
 end
 
-get '/exercise/:exercise_num' do
+match '/exercise/:exercise_num' do
   if authenticated?
     @exercise = EXERCISES[params['exercise_num']]
     user_code = params['user_code_textarea']
-    @trace = get_trace_for(user_code)
+    if user_code
+      cases_given = @exercise['cases'].map { |_case| _case['given'] }
+      @traces = get_trace_for_cases(user_code, cases_given)
+    end
     haml :index
   else
     haml :login
