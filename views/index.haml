@@ -24,15 +24,6 @@
       div.ExecutionVisualizer table#pyCodeOutput {
         margin: 0 0;
       }
-      #trace_render_div_cover {
-        position:absolute;
-        z-index:99;
-        width:100px;
-        height:100px;
-        background-color:#000000;
-        opacity:0.1;
-        display:none;
-      }
       table {
         border-collapse: collapse;
         margin: 20px 0;
@@ -79,7 +70,8 @@
             %th Actual
             %th Result
             %td{ :rowspan => @exercise['cases'].size + 1 }
-              %button(style='height:100%') Run
+              %button(id='edit-button' style='height:100%') Edit
+              %button(id='run-button'  style='height:100%') Run
           - @exercise['cases'].each_with_index do |_case, i|
             %tr{ :'data-trace-num' => i }
               %td
@@ -99,7 +91,6 @@
           %textarea#user_code_textarea(name='user_code_textarea'
                                        cols='40' rows='20')
             = params["user_code_textarea"]
-      #trace_render_div_cover
       - if @traces
         - @traces.each_with_index do |trace, i|
           %div{ :id => "trace_render_div#{i}", :class => 'trace_render_div' }

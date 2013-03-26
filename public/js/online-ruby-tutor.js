@@ -78,23 +78,24 @@ function assert(cond) {
 
       $('#user_code_div').hide();
 
-      $('#trace_render_div_cover').show();
-      $('#trace_render_div_cover').click(function(event) {
-        $('#trace_render_div_cover').hide();
-        $('#trace_render_div').hide();
+      $('#edit-button').click(function(event) {
+        $('.trace_render_div').hide();
         $('#user_code_div').show();
         userCodeCodeMirror.focus();
+        event.preventDefault();
       });
 
       $('.trace_render_div').hide();
       $('#traces-table tr').click(function(e) {
         var tr = $(e.target).closest('tr');
         var traceNum = tr.attr('data-trace-num');
-        $('.trace_render_div').hide();
-        $('#trace_render_div' + traceNum).show();
-        $('#trace_render_div' + traceNum + ' #jmpLastInstr').trigger('click');
-        $('#traces-table tr').removeClass('selectedRow');
-        tr.addClass('selectedRow');
+        if (traceNum) {
+          $('.trace_render_div').hide();
+          $('#trace_render_div' + traceNum).show();
+          $('#trace_render_div' + traceNum + ' #jmpLastInstr').trigger('click');
+          $('#traces-table tr').removeClass('selectedRow');
+          tr.addClass('selectedRow');
+        }
       });
       $('#traces-table tr[data-trace-num="0"]').trigger('click');
     }
