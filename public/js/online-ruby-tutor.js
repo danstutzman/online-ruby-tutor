@@ -96,6 +96,7 @@ function assert(cond) {
         $('#traces-table tr').removeClass('selectedRow');
         tr.addClass('selectedRow');
       });
+      $('#traces-table tr[data-trace-num="0"]').trigger('click');
     }
   });
 })();
