@@ -53,6 +53,16 @@
       #traces-table tr.selectedRow {
         background-color: #faa;
       }
+      .failed {
+         color:red;
+         display:inline-block;
+         width:60px
+      }
+      .passed {
+         color:green;
+         display:inline-block;
+         width:60px
+      }
 
   %body
     %form(method='post')
@@ -79,7 +89,10 @@
               %td
                 %code= (@traces ? @traces[i]['returned'] : nil).inspect
               %td
-                %div(style='color:red;display:inline-block;width:60px') FAILED
+                - if (@traces ? @traces[i]['returned'] : nil) == _case['expected']
+                  .passed PASSED
+                - else
+                  .failed FAILED
         %hr
 
         #user_code_div
