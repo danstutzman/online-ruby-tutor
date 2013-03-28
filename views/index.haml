@@ -19,7 +19,7 @@
       %script
         != "var traces_json = #{JSON.dump(@traces).inspect};"
 
-    %script(src='/js/online-ruby-tutor.js')
+    %script(src='/js/application.js')
     :css
       div.ExecutionVisualizer table#pyCodeOutput {
         margin: 0 0;
