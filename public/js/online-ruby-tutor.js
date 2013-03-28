@@ -98,6 +98,10 @@ function assert(cond) {
         }
       });
       $('#traces-table tr[data-trace-num="0"]').trigger('click');
+
+      if ($('#traces-table').length == 0) {
+        $('#trace_render_div0').show();
+      }
     }
   });
 })();

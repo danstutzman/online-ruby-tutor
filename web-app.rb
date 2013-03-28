@@ -34,16 +34,12 @@ def match(path, opts={}, &block)
 end
 
 get '/' do
-  if authenticated?
-    haml :index
-  else
-    haml :login
-  end
+  haml :index
 end
 
 post '/' do
   user_code = params['user_code_textarea']
-  @traces = get_trace_for_cases(user_code, [{ :a => 1, :b => 2 }, { :a => 3, :c => 4 }])
+  @traces = get_trace_for_cases(user_code, [{}])
   haml :index
 end
 
