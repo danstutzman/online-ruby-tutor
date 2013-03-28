@@ -1,0 +1,4 @@
+1. create config.yaml with correct values
+2. git submodule init
+3. git submodule update
+
