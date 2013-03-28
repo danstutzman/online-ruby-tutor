@@ -1,0 +1,40 @@
+div.ExecutionVisualizer table#pyCodeOutput {
+  margin: 0 0;
+}
+table {
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+th, td {
+  padding: 0px 5px;
+}
+body {
+  font-family: sans-serif;
+}
+tr.headers th {
+  background-color: gray;
+  color: white;
+}
+#traces-table {
+  cursor: pointer;
+}
+#traces-table tr.selectedRow {
+  background-color: #faa;
+}
+.failed {
+   color:red;
+   display:inline-block;
+   width:60px
+}
+.passed {
+   color:green;
+   display:inline-block;
+   width:60px
+}
+pre {
+   margin: 0;
+   padding: 0;
+}
+td {
+  vertical-align: top;
+}

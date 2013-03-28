@@ -15,53 +15,11 @@
     %link(href='/css/codemirror.css' rel='stylesheet' type='text/css')
     %script(src='/js/codemirror-ruby.js')
 
+    %script(src='/js/application.js')
+    %link(href='/css/application.css' rel='stylesheet' type='text/css')
     - if @traces
       %script
         != "var traces_json = #{JSON.dump(@traces).inspect};"
-
-    %script(src='/js/application.js')
-    :css
-      div.ExecutionVisualizer table#pyCodeOutput {
-        margin: 0 0;
-      }
-      table {
-        border-collapse: collapse;
-        margin: 20px 0;
-      }
-      th, td {
-        padding: 0px 5px;
-      }
-      body {
-        font-family: sans-serif;
-      }
-      tr.headers th {
-        background-color: gray;
-        color: white;
-      }
-      #traces-table {
-        cursor: pointer;
-      }
-      #traces-table tr.selectedRow {
-        background-color: #faa;
-      }
-      .failed {
-         color:red;
-         display:inline-block;
-         width:60px
-      }
-      .passed {
-         color:green;
-         display:inline-block;
-         width:60px
-      }
-      pre {
-         margin: 0;
-         padding: 0;
-      }
-      td {
-        vertical-align: top;
-      }
-
   %body
     %form(method='post')
       - if @exercise
