@@ -3,7 +3,11 @@
   cases:
   - given:
       a: 3
-    expected: 4
+    expected_return: 4
   - given:
       a: 4
-    expected: 5
+    expected_return: 5
+"2":
+  description: "Print out 123"
+  cases:
+  - expected_stdout: "123\n456\n"

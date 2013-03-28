@@ -82,7 +82,7 @@ match '/exercise/:exercise_num' do
     @exercise = EXERCISES[params['exercise_num']]
     user_code = params['user_code_textarea']
     if user_code
-      cases_given = @exercise['cases'].map { |_case| _case['given'] }
+      cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
       @traces = get_trace_for_cases(user_code, cases_given)
     end
     haml :index

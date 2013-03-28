@@ -54,6 +54,13 @@
          display:inline-block;
          width:60px
       }
+      pre {
+         margin: 0;
+         padding: 0;
+      }
+      td {
+        vertical-align: top;
+      }
 
   %body
     %form(method='post')
@@ -65,26 +72,55 @@
         %br
         %table#traces-table
           %tr.headers
-            %th Given
-            %th Expected
-            %th Actual
+            - if @exercise['cases'].first['given']
+              %th Given
+
+            - if @exercise['cases'].first['expected_return']
+              %th Expected return
+            - elsif @exercise['cases'].first['expected_stdout']
+              %th Expected output
+
+            - if @exercise['cases'].first['expected_return']
+              %th Actual return
+            - elsif @exercise['cases'].first['expected_stdout']
+              %th Actual output
+
             %th Result
             %td{ :rowspan => @exercise['cases'].size + 1 }
               %button(id='edit-button' style='height:100%') Edit
               %button(id='run-button'  style='height:100%') Run
           - @exercise['cases'].each_with_index do |_case, i|
             %tr{ :'data-trace-num' => i }
+              - if @exercise['cases'].first['given']
+                %td
+                  %code= (_case['given'] || {}).map { |var, val| "#{var} = #{val}" }.join(', ')
+
+              - if @exercise['cases'].first['expected_return']
+                %td
+                  %code= _case['expected_return'].inspect
+              - elsif @exercise['cases'].first['expected_stdout']
+                %td
+                  %pre= _case['expected_stdout']
+
+              - if @exercise['cases'].first['expected_return']
+                %td
+                  %code= (@traces ? @traces[i]['returned'] : nil).inspect
+              - elsif @exercise['cases'].first['expected_stdout']
+                %td
+                  %pre= @traces && @traces[i]['trace'].last['stdout']
+
               %td
-                %code= _case['given'].map { |var, val| "#{var} = #{val}" }.join(', ')
-              %td
-                %code= _case['expected']
-              %td
-                %code= (@traces ? @traces[i]['returned'] : nil).inspect
-              %td
-                - if (@traces ? @traces[i]['returned'] : nil) == _case['expected']
-                  .passed PASSED
-                - else
-                  .failed FAILED
+                - if @traces
+                  - if _case['expected_return']
+                    - if @traces[i]['returned'] == _case['expected_return']
+                      .passed PASSED
+                    - else
+                      .failed FAILED
+                  - elsif _case['expected_stdout']
+                    - if (@traces[i]['trace'].last['stdout'] || '').chomp == _case['expected_stdout'].chomp
+                      .passed PASSED
+                    - else
+                      .failed FAILED
         %hr
 
       - if @traces
