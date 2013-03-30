@@ -31,6 +31,17 @@ function assert(cond) {
       }
     });
 
+    // Change "a b" to a(newline)b
+    $('span.stringObj').each(function(i) {
+      var s = this;
+      var sNode = s.childNodes[0];
+      if (sNode) {
+        sNode.nodeValue = sNode.nodeValue.replace(/^"([\s\S]*)"$/, "$1");
+        s.innerHTML = sNode.nodeValue.replace(/\\"/g, "\"");
+        s.innerHTML = sNode.nodeValue.replace(/\n/g, "<br>");
+      }
+    });
+
     $('#pyCodeOutput').click(function() {
       $('#trace_render_div').hide();
       $('#user_code_div').show();
