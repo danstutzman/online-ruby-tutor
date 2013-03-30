@@ -68,8 +68,10 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     
     heap = {}
     def represent_value(value, heap)
-      if [Fixnum, NilClass, String, Symbol, TrueClass, FalseClass].include?(value.class)
+      if [Fixnum, NilClass, Symbol, TrueClass, FalseClass].include?(value.class)
         return value
+      elsif String === value
+        return value.clone
       elsif [Array, Hash, Proc].include?(value.class)
         on_heap = case value
           when Array
