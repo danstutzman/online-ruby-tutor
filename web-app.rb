@@ -80,6 +80,8 @@ end
 match '/exercise/:exercise_num' do
   if authenticated?
     @exercise = EXERCISES[params['exercise_num'].to_i]
+    halt(404, 'Exercise not found') if @exercise.nil?
+
     user_code = params['user_code_textarea']
     if user_code
       cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
