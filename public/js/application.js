@@ -103,7 +103,6 @@ function assert(cond) {
         if (traceNum) {
           $('.trace_render_div').hide();
           $('#trace_render_div' + traceNum).show();
-          $('#trace_render_div' + traceNum + ' #jmpLastInstr').trigger('click');
           $('#traces-table tr').removeClass('selectedRow');
           tr.addClass('selectedRow');
         }
