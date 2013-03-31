@@ -43,10 +43,12 @@
             - elsif @exercise['cases'].first['expected_stdout']
               %th Actual output
 
-            %th Result
-            %td{ :rowspan => @exercise['cases'].size + 1 }
-              %button(id='edit-button' style='height:100%') Edit
-              %button(id='run-button'  style='height:100%') Run
+            %th Test passed?
+
+            %th.action-buttons{ :rowspan => @exercise['cases'].size + 1 }
+              %button(id='edit-button' style='height:100%') Edit code
+              %button(id='run-button'  style='height:100%') Run code
+
           - @exercise['cases'].each_with_index do |_case, i|
             %tr{ :'data-trace-num' => i }
               - if @exercise['cases'].first['given']
@@ -79,7 +81,6 @@
                       .passed PASSED
                     - else
                       .failed FAILED
-        %hr
 
       - if @traces
         - @traces.each_with_index do |trace, i|
@@ -90,5 +91,5 @@
                                      cols='40' rows='20')
           = params["user_code_textarea"]
       - if @exercise.nil?
-        %button(id='edit-button' style='height:100%') Edit
-        %button(id='run-button'  style='height:100%') Run
+        %button(id='edit-button' style='height:100%') Edit code
+        %button(id='run-button'  style='height:100%') Run code

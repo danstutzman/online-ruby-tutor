@@ -14,12 +14,16 @@ body {
 tr.headers th {
   background-color: gray;
   color: white;
+  border-top: 1px black solid;
+  border-right: 1px black solid;
 }
 #traces-table {
   cursor: pointer;
 }
 #traces-table tr.selectedRow {
-  background-color: #faa;
+  background-color: #00d;
+  color: white;
+  font-weight: bold;
 }
 .failed {
    color:red;
@@ -35,9 +39,25 @@ pre {
    margin: 0;
    padding: 0;
 }
-td {
-  vertical-align: top;
-}
 .stringObj {
   background-color: #ddd;
+}
+#traces-table tr.headers th.action-buttons {
+  background-color: transparent;
+  color: black;
+  font-weight: normal;
+  border: none;
+}
+#traces-table td {
+  vertical-align: top;
+  border-left: 1px black solid;
+  border-right: 1px black solid;
+  border-bottom: 1px black solid;
+  padding: 5px 8px;
+}
+#user_code_div {
+  border: 1px #ccc solid;
+}
+.CodeMirror {
+  font-family: "Andale mono", monospace;
 }
