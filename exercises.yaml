@@ -1,13 +1,15 @@
-"1":
-  description: "You're given an integer; add one to it"
+1:
+  description: "Print out the number 4"
   cases:
-  - given:
-      a: 3
-    expected_return: 4
-  - given:
-      a: 4
-    expected_return: 5
-"2":
-  description: "Print out 123"
+  - expected_stdout: 4
+2:
+  description: "Print out the number 5"
   cases:
-  - expected_stdout: "123\n456\n"
+  - expected_stdout: 5
+3:
+  description: "Print out the value of variable x"
+  cases:
+  - given: { x: 4 }
+    expected_stdout: 4
+  - given: { x: 5 }
+    expected_stdout: 5

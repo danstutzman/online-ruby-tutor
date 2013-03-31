@@ -75,7 +75,7 @@
                     - else
                       .failed FAILED
                   - elsif _case['expected_stdout']
-                    - if (@traces[i]['trace'].last['stdout'] || '').chomp == _case['expected_stdout'].chomp
+                    - if (@traces[i]['trace'].last['stdout'] || '').chomp == _case['expected_stdout'].to_s.chomp
                       .passed PASSED
                     - else
                       .failed FAILED
