@@ -14,8 +14,25 @@
   - apt: "pkg=nginx"
   - apt: "pkg=git"
   - apt: "pkg=make"
+  - apt: "pkg=g++"
+  - apt: "pkg=postgresql"
+  - apt: "pkg=libpq-dev"
+  - apt: "pkg=libsqlite3-dev"
+
+  - command: mkdir /var/lib/postgresql/.ssh creates=/var/lib/postgresql/.ssh
+  - command: chown postgres:postgres /var/lib/postgresql/.ssh
+  - command: cp /root/.ssh/authorized_keys /var/lib/postgresql/.ssh/authorized_keys
+  - command: chown postgres:postgres /var/lib/postgresql/.ssh/authorized_keys
+  - command: chmod 0600 /var/lib/postgresql/.ssh/authorized_keys
 
   - command: gem install bundler creates=/usr/local/bin/bundle
+
+- hosts: web
+  user: postgres
+  tasks:
+  - command: sh -c "createuser -S -D -R online_ruby_tutor && touch .created_role_for_online_ruby_tutor" creates=/var/lib/postgresql/.created_role_for_online_ruby_tutor
+  - command: "sh -c \"echo alter user online_ruby_tutor with password 'online_ruby_tutor';\" | psql"
+  - command: sh -c "createdb -O online_ruby_tutor online_ruby_tutor && touch .created_db_for_online_ruby_tutor" creates=/var/lib/postgresql/.created_db_for_online_ruby_tutor
 
 - hosts: web
   user: deployer
@@ -23,6 +40,7 @@
   - command: "git clone https://github.com/danielstutzman/online-ruby-tutor creates=/home/deployer/online-ruby-tutor"
   - command: "git pull chdir=/home/deployer/online-ruby-tutor"
   - command: "bundle install --deployment chdir=/home/deployer/online-ruby-tutor"
+  - command: "sh -c 'RACK_ENV=production bundle exec ruby run_migrations.rb' chdir=/home/deployer/online-ruby-tutor"
   - command: "mkdir -p tmp tmp/sockets tmp/pids log chdir=/home/deployer/online-ruby-tutor"
   - command: "git submodule init chdir=/home/deployer/online-ruby-tutor"
   - command: "git submodule update chdir=/home/deployer/online-ruby-tutor"
