@@ -1,3 +1,6 @@
+require 'yaml'
+require 'active_record'
+
 # set path to app that will be used to configure unicorn, 
 # note the trailing slash in this example
 @dir = "/home/deployer/online-ruby-tutor/"

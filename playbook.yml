@@ -31,7 +31,7 @@
   user: postgres
   tasks:
   - command: sh -c "createuser -S -D -R online_ruby_tutor && touch .created_role_for_online_ruby_tutor" creates=/var/lib/postgresql/.created_role_for_online_ruby_tutor
-  - command: "sh -c \"echo alter user online_ruby_tutor with password 'online_ruby_tutor';\" | psql"
+  - command: "sh -c \"echo alter user online_ruby_tutor with password \\\\'online_ruby_tutor\\\\' | psql\""
   - command: sh -c "createdb -O online_ruby_tutor online_ruby_tutor && touch .created_db_for_online_ruby_tutor" creates=/var/lib/postgresql/.created_db_for_online_ruby_tutor
 
 - hosts: web
