@@ -10,4 +10,8 @@ ActiveRecord::Base.establish_connection(db_params)
 
 ActiveRecord::Base.logger = Logger.new(STDOUT)
 ActiveRecord::Migration.verbose = true
-ActiveRecord::Migrator.migrate("db/migrate")
+if ARGV[0] == 'rollback'
+  ActiveRecord::Migrator.rollback("db/migrate")
+else
+  ActiveRecord::Migrator.migrate("db/migrate")
+end
