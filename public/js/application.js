@@ -132,14 +132,18 @@ function assert(cond) {
    $('.case-content').hide();
 
    $('#edit-tab-link').click(function(event) {
-     $('.case-content').hide();
-     $('#edit-content').show();
+     if (event.target.nodeName == 'BUTTON') {
+       return true;
+     } else {
+       $('.case-content').hide();
+       $('#edit-content').show();
 
-     $('.case-tab').removeClass('selected');
-     $('#edit-tab').addClass('selected');
+       $('.case-tab').removeClass('selected');
+       $('#edit-tab').addClass('selected');
 
-     event.preventDefault();
-     return false;
+       event.preventDefault();
+       return false;
+     }
    });
 
    $('.case-tab-link').click(function(event) {
