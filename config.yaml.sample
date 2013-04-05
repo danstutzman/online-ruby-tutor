@@ -1,8 +1,14 @@
 GOOGLE_KEY: '123456789012.apps.googleusercontent.com'
 GOOGLE_SECRET: 'a1a1a1a1a1a1a1a1a1a1a1a1'
 COOKIE_SIGNING_SECRET: '12345abcdef'
-USERS:
- - first_name: Daniel
-   last_name: Stutzman
-   email: dtstutz@gmail.com
-   google_plus_uid: '112826277336975923063'
+DATABASE_PARAMS:
+  development:
+    adapter: sqlite3
+    database: database.sqlite3
+  production:
+    host:     localhost
+    adapter:  postgresql
+    username: student_checklist
+    password: student_checklist
+    database: student_checklist
+    encoding: unicode

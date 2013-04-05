@@ -7,13 +7,26 @@ require 'omniauth-google-oauth2'
 require 'yaml'
 require 'erubis'
 require 'tilt'
+require 'active_record'
 require './get_trace_for.rb'
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
 CONFIG = YAML.load_file(config_path)
+env = ENV['RACK_ENV'] || 'development'
+if env == 'development'
+  db_params = CONFIG['DATABASE_PARAMS'][env]
+  ActiveRecord::Base.establish_connection(db_params)
+else
+  # load it in unicorn.rb
+end
+ActiveRecord::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Base.logger.formatter = proc { |sev, time, prog, msg| "#{msg}\n" }
 
 exercises_path = File.join(File.dirname(__FILE__), 'exercises.yaml')
 EXERCISES = YAML.load_file(exercises_path)
+
+class User < ActiveRecord::Base
+end
 
 use Rack::Session::Cookie, {
   :key => 'rack.session',
@@ -26,13 +39,8 @@ set :static_cache_control, [:public, :no_cache]
 set :haml, { :format => :html5, :escape_html => true, :ugly => true }
 
 def authenticated?
-  CONFIG['USERS'].each do |user|
-    if session[:google_plus_user_id] == user['google_plus_uid']
-      @current_user = user
-      return true
-    end
-  end
-  false
+  @current_user =
+    User.find_by_google_plus_user_id(session[:google_plus_user_id])
 end
 
 def match(path, opts={}, &block)
@@ -136,4 +144,8 @@ end
 post '/logout' do
   session[:google_plus_user_id] = nil
   redirect '/'
+end
+
+after do
+  ActiveRecord::Base.clear_active_connections!
 end

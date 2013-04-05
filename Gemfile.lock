@@ -1,15 +1,19 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    coderay (1.0.8)
-    columnize (0.3.6)
-    debugger (1.2.4)
-      columnize (>= 0.3.1)
-      debugger-linecache (~> 1.1.1)
-      debugger-ruby_core_source (~> 1.1.7)
-    debugger-linecache (1.1.2)
-      debugger-ruby_core_source (>= 1.1.1)
-    debugger-ruby_core_source (1.1.8)
+    activemodel (3.2.13)
+      activesupport (= 3.2.13)
+      builder (~> 3.0.0)
+    activerecord (3.2.13)
+      activemodel (= 3.2.13)
+      activesupport (= 3.2.13)
+      arel (~> 3.0.2)
+      tzinfo (~> 0.3.29)
+    activesupport (3.2.13)
+      i18n (= 0.6.1)
+      multi_json (~> 1.0)
+    arel (3.0.2)
+    builder (3.0.4)
     erubis (2.7.0)
     faraday (0.8.6)
       multipart-post (~> 1.1)
@@ -17,10 +21,10 @@ GEM
       tilt
     hashie (1.2.0)
     httpauth (0.2.0)
+    i18n (0.6.1)
     jwt (0.1.7)
       multi_json (>= 1.5)
     kgio (2.8.0)
-    method_source (0.8.1)
     multi_json (1.6.1)
     multipart-post (1.2.0)
     oauth2 (0.8.1)
@@ -38,13 +42,7 @@ GEM
     omniauth-oauth2 (1.1.1)
       oauth2 (~> 0.8.0)
       omniauth (~> 1.0)
-    pry (0.9.12)
-      coderay (~> 1.0.5)
-      method_source (~> 0.8)
-      slop (~> 3.4)
-    pry-debugger (0.2.1)
-      debugger (~> 1.2.0)
-      pry (~> 0.9.10)
+    pg (0.14.1)
     rack (1.5.2)
     rack-protection (1.3.2)
       rack
@@ -53,8 +51,9 @@ GEM
       rack (~> 1.4)
       rack-protection (~> 1.3)
       tilt (~> 1.3, >= 1.3.3)
-    slop (3.4.3)
+    sqlite3 (1.3.7)
     tilt (1.3.3)
+    tzinfo (0.3.37)
     unicorn (4.6.2)
       kgio (~> 2.6)
       rack
@@ -64,11 +63,13 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord
   erubis
   haml
   omniauth
   omniauth-google-oauth2
-  pry-debugger
+  pg
   sinatra
+  sqlite3
   tilt
   unicorn

@@ -1,9 +1,11 @@
-source "https://rubygems.org"
-gem "pry-debugger", :group => "development"
-gem "sinatra"
-gem "haml"
-gem "unicorn", :group => "production"
-gem "omniauth"
-gem "omniauth-google-oauth2"
-gem "tilt"
-gem "erubis"
+source 'https://rubygems.org'
+gem 'sinatra'
+gem 'haml'
+gem 'unicorn', :group => 'production'
+gem 'omniauth'
+gem 'omniauth-google-oauth2'
+gem 'tilt'
+gem 'erubis'
+gem 'activerecord'
+gem 'sqlite3', :group => 'development'
+gem 'pg', :group => 'production'
