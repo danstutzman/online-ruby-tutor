@@ -91,6 +91,10 @@ get '/' do
 end
 
 post '/' do
+  if params['logout']
+    session[:google_plus_user_id] = nil
+    redirect '/'
+  end
   @user_code = params['user_code_textarea']
   Save.transaction do
     Save.update_all("is_current = 'f'", {
@@ -151,6 +155,11 @@ get '/login' do
 end
 
 match '/exercise/:exercise_num' do
+  if params['logout']
+    session[:google_plus_user_id] = nil
+    redirect '/'
+  end
+
   @exercise = EXERCISES[params['exercise_num'].to_i]
   halt(404, 'Exercise not found') if @exercise.nil?
 
@@ -184,11 +193,6 @@ match '/exercise/:exercise_num' do
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index
-end
-
-post '/logout' do
-  session[:google_plus_user_id] = nil
-  redirect '/'
 end
 
 after do

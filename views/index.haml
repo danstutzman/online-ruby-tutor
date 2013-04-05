@@ -42,7 +42,7 @@
         .filler.filler-tall
           logged in as
           = @current_user && @current_user.first_name
-          %button Logout
+          %button(name='logout' value='logout') Logout
 
       #edit-content
         #user_code_div
