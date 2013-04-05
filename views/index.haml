@@ -46,8 +46,8 @@
             %th Test passed?
 
             %th.action-buttons{ :rowspan => @exercise['cases'].size + 1 }
-              %button(id='edit-button' style='height:100%') Edit code
-              %button(id='run-button'  style='height:100%') Run code
+              %button#edit-button(style='height:100%') Edit code
+              %button#run-button(style='height:100%') Run code
 
           - @exercise['cases'].each_with_index do |_case, i|
             %tr{ :'data-trace-num' => i }
@@ -84,12 +84,15 @@
 
       - if @traces
         - @traces.each_with_index do |trace, i|
-          %div{ :id => "trace_render_div#{i}", :class => 'trace_render_div' }
+          %div.trace_render_div{ :id => "trace_render_div#{i}" }
 
       #user_code_div
         %textarea#user_code_textarea(name='user_code_textarea'
                                      cols='40' rows='20')
           = params["user_code_textarea"]
       - if @exercise.nil?
-        %button(id='edit-button' style='height:100%') Edit code
-        %button(id='run-button'  style='height:100%') Run code
+        %button#edit-button(style='height:100%') Edit code
+        %button#run-button(style='height:100%') Run code
+
+      %hr
+      != erb :ruby_composer

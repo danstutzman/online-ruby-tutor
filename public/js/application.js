@@ -93,6 +93,10 @@ function assert(cond) {
         $('.trace_render_div').hide();
         $('#user_code_div').show();
         userCodeCodeMirror.focus();
+
+        $('#edit-button').addClass('selected');
+        $('#run-button').removeClass('selected');
+
         event.preventDefault();
       });
 
@@ -105,6 +109,9 @@ function assert(cond) {
           $('#trace_render_div' + traceNum).show();
           $('#traces-table tr').removeClass('selectedRow');
           tr.addClass('selectedRow');
+
+          $('#edit-button').removeClass('selected');
+          $('#run-button').addClass('selected');
         }
       });
       $('#traces-table tr[data-trace-num="0"]').trigger('click');

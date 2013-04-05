@@ -61,3 +61,6 @@ pre {
 .CodeMirror {
   font-family: "Andale mono", monospace;
 }
+button.selected {
+  border: 2px blue solid;
+}
