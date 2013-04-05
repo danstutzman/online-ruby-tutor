@@ -77,8 +77,14 @@ before do
 end
 
 get '/' do
-  @user_code = ''
-  @traces = get_trace_for_cases(user_code, [{}])
+  old_record =
+    Save.where({
+      :user_id      => @current_user.id,
+      :exercise_num => '/',
+      :is_current   => true
+    }).first
+  @user_code = (old_record || Save.new).code || ''
+  @traces = get_trace_for_cases(@user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index
@@ -86,7 +92,20 @@ end
 
 post '/' do
   @user_code = params['user_code_textarea']
-  @traces = get_trace_for_cases(user_code, [{}])
+  Save.transaction do
+    Save.update_all("is_current = 'f'", {
+      :user_id      => @current_user.id,
+      :exercise_num => '/',
+      :is_current   => true
+    })
+    Save.create({
+      :user_id      => @current_user.id,
+      :exercise_num => '/',
+      :is_current   => true,
+      :code         => @user_code,
+    })
+  end
+  @traces = get_trace_for_cases(@user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index
@@ -137,13 +156,20 @@ match '/exercise/:exercise_num' do
 
   if request.get?
     old_record =
-      Save.where(:user_id => @current_user.id, :is_current => true).first
+      Save.where({
+        :user_id      => @current_user.id,
+        :exercise_num => params['exercise_num'],
+        :is_current   => true
+      }).first
     @user_code = (old_record || Save.new).code || ''
   elsif request.post?
     @user_code = params['user_code_textarea']
     Save.transaction do
-      Save.update_all("is_current = 'f'",
-        { :user_id => @current_user.id, :is_current => true })
+      Save.update_all("is_current = 'f'", {
+        :user_id      => @current_user.id,
+        :exercise_num => params['exercise_num'],
+        :is_current   => true
+      })
       Save.create({
         :user_id      => @current_user.id,
         :exercise_num => params['exercise_num'],
