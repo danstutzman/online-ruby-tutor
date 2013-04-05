@@ -26,31 +26,31 @@
           != "#{word.inspect}: #{method_indexes.inspect},"
         = "1: 1 };"
   %body
-    #sidebar
-      %a#edit-tab-link(href='#')
-        #edit-tab.tab
-          %h2 Edit
-          %button Save
-          %button Run
-      .filler
-      - @traces.each_with_index do |trace, i|
-        %a.case-tab-link(href="#")
-          .tab.case-tab{ :"data-case-num" => i }
-            %h2
-              = "Case #{i}"
-      .filler.filler-tall
-        logged in as
-        = @current_user && @current_user.first_name
-        %form(method='post' action='/logout')
+    %form(method='post')
+      #sidebar
+        %a#edit-tab-link(href='#')
+          #edit-tab.tab
+            %h2 Edit
+            %button Save
+            %button Run
+        .filler
+        - @traces.each_with_index do |trace, i|
+          %a.case-tab-link(href="#")
+            .tab.case-tab{ :"data-case-num" => i }
+              %h2
+                = "Case #{i}"
+        .filler.filler-tall
+          logged in as
+          = @current_user && @current_user.first_name
           %button Logout
 
-    #edit-content
-      #user_code_div
-        %textarea#user_code_textarea(name='user_code_textarea'
-                                     cols='40' rows='10')
-          = params["user_code_textarea"]
-      != haml :ruby_composer
+      #edit-content
+        #user_code_div
+          %textarea#user_code_textarea(name='user_code_textarea'
+                                       cols='40' rows='10')
+            = @user_code
+        != haml :ruby_composer
 
-    - if @traces
-      - @traces.each_with_index do |trace, i|
-        .case-content{ :id => "trace_render_div#{i}" }
+      - if @traces
+        - @traces.each_with_index do |trace, i|
+          .case-content{ :id => "trace_render_div#{i}" }

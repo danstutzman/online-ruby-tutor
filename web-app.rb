@@ -28,6 +28,9 @@ EXERCISES = YAML.load_file(exercises_path)
 class User < ActiveRecord::Base
 end
 
+class Save < ActiveRecord::Base
+end
+
 use Rack::Session::Cookie, {
   :key => 'rack.session',
   :secret => CONFIG['COOKIE_SIGNING_SECRET'],
@@ -75,7 +78,7 @@ before do
 end
 
 get '/' do
-  user_code = ''
+  @user_code = ''
   @traces = get_trace_for_cases(user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
@@ -83,7 +86,7 @@ get '/' do
 end
 
 post '/' do
-  user_code = params['user_code_textarea']
+  @user_code = params['user_code_textarea']
   @traces = get_trace_for_cases(user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
@@ -133,9 +136,26 @@ match '/exercise/:exercise_num' do
   @exercise = EXERCISES[params['exercise_num'].to_i]
   halt(404, 'Exercise not found') if @exercise.nil?
 
-  user_code = params['user_code_textarea'] || ''
+  if request.get?
+    old_record =
+      Save.where(:user_id => @current_user.id, :is_current => true).first
+    @user_code = (old_record || Save.new).code || ''
+  elsif request.post?
+    @user_code = params['user_code_textarea']
+    Save.transaction do
+      Save.update_all("is_current = 'f'",
+        { :user_id => @current_user.id, :is_current => true })
+      Save.create({
+        :user_id      => @current_user.id,
+        :exercise_num => params['exercise_num'],
+        :is_current   => true,
+        :code         => @user_code,
+      })
+    end
+  end
+
   cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
-  @traces = get_trace_for_cases(user_code, cases_given)
+  @traces = get_trace_for_cases(@user_code, cases_given)
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index

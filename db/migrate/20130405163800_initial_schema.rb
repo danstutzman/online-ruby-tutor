@@ -7,9 +7,17 @@ class InitialSchema < ActiveRecord::Migration
       t.string :google_plus_user_id, :limit => 30, :null => false
       t.timestamps
     end
+    create_table :saves do |t|
+      t.integer :user_id,      :null => false
+      t.string  :exercise_num, :null => false
+      t.boolean :is_current,   :null => false
+      t.text    :code,         :null => false
+      t.timestamps
+    end
   end
 
   def down
     drop_table :users
+    drop_table :saves
   end
 end
