@@ -10,6 +10,7 @@ GEM
     debugger-linecache (1.1.2)
       debugger-ruby_core_source (>= 1.1.1)
     debugger-ruby_core_source (1.1.8)
+    erubis (2.7.0)
     faraday (0.8.6)
       multipart-post (~> 1.1)
     haml (4.0.0)
@@ -63,9 +64,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  erubis
   haml
   omniauth
   omniauth-google-oauth2
   pry-debugger
   sinatra
+  tilt
   unicorn

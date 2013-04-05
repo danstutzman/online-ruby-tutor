@@ -5,6 +5,8 @@ require 'haml'
 require 'omniauth'
 require 'omniauth-google-oauth2'
 require 'yaml'
+require 'erubis'
+require 'tilt'
 require './get_trace_for.rb'
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
