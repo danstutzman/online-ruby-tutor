@@ -54,6 +54,10 @@ def load_word_to_method_indexes(methods)
 end
 
 get '/' do
+  user_code = ''
+  @traces = get_trace_for_cases(user_code, [{}])
+  @methods = load_methods
+  @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index
 end
 
@@ -104,11 +108,9 @@ match '/exercise/:exercise_num' do
     @exercise = EXERCISES[params['exercise_num'].to_i]
     halt(404, 'Exercise not found') if @exercise.nil?
 
-    user_code = params['user_code_textarea']
-    if user_code
-      cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
-      @traces = get_trace_for_cases(user_code, cases_given)
-    end
+    user_code = params['user_code_textarea'] || ''
+    cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
+    @traces = get_trace_for_cases(user_code, cases_given)
     @methods = load_methods
     @word_to_method_indexes = load_word_to_method_indexes(@methods)
     haml :index

@@ -81,44 +81,11 @@ function assert(cond) {
       };
       for (var i = 0; i < traces.length; i++) {
         setupVisualizer(i);
-        $('#trace_render_div' + i).show();
       }
 
       $('#jmpStepFwd' ).click(function(event) { changePythonToRuby(); });
       $('#jmpStepBack').click(function(event) { changePythonToRuby(); });
 
-      $('#user_code_div').hide();
-
-      $('#edit-button').click(function(event) {
-        $('.trace_render_div').hide();
-        $('#user_code_div').show();
-        userCodeCodeMirror.focus();
-
-        $('#edit-button').addClass('selected');
-        $('#run-button').removeClass('selected');
-
-        event.preventDefault();
-      });
-
-      $('.trace_render_div').hide();
-      $('#traces-table tr').click(function(e) {
-        var tr = $(e.target).closest('tr');
-        var traceNum = tr.attr('data-trace-num');
-        if (traceNum) {
-          $('.trace_render_div').hide();
-          $('#trace_render_div' + traceNum).show();
-          $('#traces-table tr').removeClass('selectedRow');
-          tr.addClass('selectedRow');
-
-          $('#edit-button').removeClass('selected');
-          $('#run-button').addClass('selected');
-        }
-      });
-      $('#traces-table tr[data-trace-num="0"]').trigger('click');
-
-      if ($('#traces-table').length == 0) {
-        $('#trace_render_div0').show();
-      }
     } // end if traces_json defined
 
     var max_method_index = 0;
@@ -160,6 +127,36 @@ function assert(cond) {
         window.setTimeout(function() { handleFilterBySubstringKeydown(e) }, 1);
       }
    );
+
+   $('#edit-tab').addClass('selected');
+   $('.case-content').hide();
+
+   $('#edit-tab-link').click(function(event) {
+     $('.case-content').hide();
+     $('#edit-content').show();
+
+     $('.case-tab').removeClass('selected');
+     $('#edit-tab').addClass('selected');
+
+     event.preventDefault();
+     return false;
+   });
+
+   $('.case-tab-link').click(function(event) {
+     var case_tab = $(event.target).closest('.case-tab');
+     var case_num = case_tab.attr('data-case-num');
+
+     $('#edit-content').hide();
+     $('.case-content').hide();
+     $('#trace_render_div' + case_num).show();
+
+     $('#edit-tab').removeClass('selected');
+     $('.case-tab').removeClass('selected');
+     case_tab.addClass('selected');
+
+     event.preventDefault();
+     return false;
+   });
 
   }); // end ready
 })(); // end immediate function

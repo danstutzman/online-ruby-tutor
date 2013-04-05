@@ -26,78 +26,27 @@
           != "#{word.inspect}: #{method_indexes.inspect},"
         = "1: 1 };"
   %body
-    %form(method='post')
-      - if @exercise
-        %b
-          Exercise
-          = "#{params['exercise_num']}:"
-          = @exercise['description']
-        %br
-        %table#traces-table
-          %tr.headers
-            - if @exercise['cases'].first['given']
-              %th Given
+    #sidebar
+      %a#edit-tab-link(href='#')
+        #edit-tab.tab
+          %h2 Edit
+          %button Save
+          %button Run
+      .filler
+      - @traces.each_with_index do |trace, i|
+        %a.case-tab-link(href="#")
+          .tab.case-tab{ :"data-case-num" => i }
+            %h2
+              = "Case #{i}"
+      .filler.filler-tall
 
-            - if @exercise['cases'].first['expected_return']
-              %th Expected return
-            - elsif @exercise['cases'].first['expected_stdout']
-              %th Expected output
-
-            - if @exercise['cases'].first['expected_return']
-              %th Actual return
-            - elsif @exercise['cases'].first['expected_stdout']
-              %th Actual output
-
-            %th Test passed?
-
-            %th.action-buttons{ :rowspan => @exercise['cases'].size + 1 }
-              %button#edit-button(style='height:100%') Edit code
-              %button#run-button(style='height:100%') Run code
-
-          - @exercise['cases'].each_with_index do |_case, i|
-            %tr{ :'data-trace-num' => i }
-              - if @exercise['cases'].first['given']
-                %td
-                  %code= (_case['given'] || {}).map { |var, val| "#{var} = #{val}" }.join(', ')
-
-              - if @exercise['cases'].first['expected_return']
-                %td
-                  %code= _case['expected_return'].inspect
-              - elsif @exercise['cases'].first['expected_stdout']
-                %td
-                  %pre= _case['expected_stdout']
-
-              - if @exercise['cases'].first['expected_return']
-                %td
-                  %code= (@traces ? @traces[i]['returned'] : nil).inspect
-              - elsif @exercise['cases'].first['expected_stdout']
-                %td
-                  %pre= @traces && @traces[i]['trace'].last['stdout']
-
-              %td
-                - if @traces
-                  - if _case['expected_return']
-                    - if @traces[i]['returned'] == _case['expected_return']
-                      .passed PASSED
-                    - else
-                      .failed FAILED
-                  - elsif _case['expected_stdout']
-                    - if (@traces[i]['trace'].last['stdout'] || '').chomp == _case['expected_stdout'].to_s.chomp
-                      .passed PASSED
-                    - else
-                      .failed FAILED
-
-      - if @traces
-        - @traces.each_with_index do |trace, i|
-          %div.trace_render_div{ :id => "trace_render_div#{i}" }
-
+    #edit-content
       #user_code_div
         %textarea#user_code_textarea(name='user_code_textarea'
-                                     cols='40' rows='20')
+                                     cols='40' rows='10')
           = params["user_code_textarea"]
-      - if @exercise.nil?
-        %button#edit-button(style='height:100%') Edit code
-        %button#run-button(style='height:100%') Run code
-
-      %hr
       != haml :ruby_composer
+
+    - if @traces
+      - @traces.each_with_index do |trace, i|
+        .case-content{ :id => "trace_render_div#{i}" }

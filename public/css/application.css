@@ -55,9 +55,6 @@ pre {
   border-bottom: 1px black solid;
   padding: 5px 8px;
 }
-#user_code_div {
-  border: 1px #ccc solid;
-}
 .CodeMirror {
   font-family: "Andale mono", monospace;
 }
@@ -83,3 +80,74 @@ button.selected {
   padding-right: 25px;
 }
 
+body {
+  margin: 0;
+}
+#sidebar {
+  width: 90px;
+  float: left;
+  background-color:#eee;
+}
+.tab {
+  border:1px black solid;
+  padding: 10px;
+  width: 60px;
+  margin-left: 10px;
+  background-color: #eee;
+}
+#edit-tab {
+  border-top: none;
+  height: 80px;
+}
+.filler {
+  border-right: 1px black solid;
+  width: 91px;
+  height:20px;
+}
+.filler-tall {
+  height: 350px;
+}
+.case-tab {
+  height: 40px;
+}
+#edit-content {
+  margin-left: 95px;
+  padding: 10px;
+}
+.case-content {
+  margin-left: 95px;
+  padding: 10px;
+}
+#sidebar a {
+  text-decoration: none;
+}
+.tab h2 {
+  margin: 0;
+  padding: 0;
+  font-size: 12pt;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+}
+.tab button {
+  -webkit-appearance: square-button;
+  width: 60px;
+  border: none;
+  padding: 5px;
+  margin-top: 5px;
+}
+.tab.selected {
+  border-right: none;
+  background-color: #fff;
+}
+.CodeMirror-gutter {
+  background-color: white;
+  border: none;
+}
+.CodeMirror {
+  border: 1px #ccc solid;
+  border-top: 1px #888 solid;
+}
+.ExecutionVisualizer > table {
+  margin-top: 0;
+}
