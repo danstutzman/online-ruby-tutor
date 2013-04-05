@@ -105,7 +105,11 @@ body {
   height:20px;
 }
 .filler-tall {
-  height: 350px;
+  height: 60px;
+  width: 71px;
+  padding-top: 290px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .case-tab {
   height: 40px;

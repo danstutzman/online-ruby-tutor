@@ -26,8 +26,13 @@ set :static_cache_control, [:public, :no_cache]
 set :haml, { :format => :html5, :escape_html => true, :ugly => true }
 
 def authenticated?
-  user_id = session[:google_plus_user_id]
-  user_id && CONFIG['AUTHORIZED_GOOGLE_PLUS_UIDS'].include?(user_id)
+  CONFIG['USERS'].each do |user|
+    if session[:google_plus_user_id] == user['google_plus_uid']
+      @current_user = user
+      return true
+    end
+  end
+  false
 end
 
 def match(path, opts={}, &block)
@@ -51,6 +56,14 @@ def load_word_to_method_indexes(methods)
     }
   end
   word_to_method_indexes
+end
+
+before do
+  if ['/auth/google_oauth2/callback', '/auth/failure', '/login'].include?(request.path_info)
+    pass
+  elsif !authenticated?
+    redirect '/login'
+  end
 end
 
 get '/' do
@@ -90,10 +103,11 @@ end
 get '/auth/google_oauth2/callback' do
   response = request.env['omniauth.auth']
   uid = response['uid']
-  if CONFIG['AUTHORIZED_GOOGLE_PLUS_UIDS'].include?(uid)
-    session[:google_plus_user_id] = uid
+  session[:google_plus_user_id] = uid
+  if authenticated?
     redirect "/"
   else
+    session[:google_plus_user_id] = nil
     redirect "/auth/failure?message=Sorry,+you're+not+on+the+list.+Contact+dtstutz@gmail.com+to+be+added."
   end
 end
@@ -103,18 +117,23 @@ get '/auth/failure' do
   haml :login
 end
 
-match '/exercise/:exercise_num' do
-  if authenticated?
-    @exercise = EXERCISES[params['exercise_num'].to_i]
-    halt(404, 'Exercise not found') if @exercise.nil?
+get '/login' do
+  haml :login
+end
 
-    user_code = params['user_code_textarea'] || ''
-    cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
-    @traces = get_trace_for_cases(user_code, cases_given)
-    @methods = load_methods
-    @word_to_method_indexes = load_word_to_method_indexes(@methods)
-    haml :index
-  else
-    haml :login
-  end
+match '/exercise/:exercise_num' do
+  @exercise = EXERCISES[params['exercise_num'].to_i]
+  halt(404, 'Exercise not found') if @exercise.nil?
+
+  user_code = params['user_code_textarea'] || ''
+  cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
+  @traces = get_trace_for_cases(user_code, cases_given)
+  @methods = load_methods
+  @word_to_method_indexes = load_word_to_method_indexes(@methods)
+  haml :index
+end
+
+post '/logout' do
+  session[:google_plus_user_id] = nil
+  redirect '/'
 end

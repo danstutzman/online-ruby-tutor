@@ -39,6 +39,10 @@
             %h2
               = "Case #{i}"
       .filler.filler-tall
+        logged in as
+        = @current_user && @current_user['first_name']
+        %form(method='post' action='/logout')
+          %button Logout
 
     #edit-content
       #user_code_div
