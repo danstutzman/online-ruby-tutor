@@ -12,7 +12,7 @@
       %tr{:id => "method_#{method_index}"}
         %td.name= method['name']
         %td.form
-          %code= method['form'].gsub(/\b([is])\b/, '<u>\1</u>').gsub(%r[^(<u>i</u> = )], "<span class='optional-assignment'>\\1</span>")
+          %code!= method['form'].gsub(/\b([is])\b/, '<u>\1</u>').gsub(%r[^(<u>i</u> = )], "<span class='optional-assignment'>\\1</span>")
         %td.example
           %code= method['example']
         %td.output= method['output']
