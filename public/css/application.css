@@ -64,3 +64,22 @@ pre {
 button.selected {
   border: 2px blue solid;
 }
+
+#methods-div {
+  overflow:scroll;
+  overflow-x:hidden;
+  height:200px;
+  width:100%;
+}
+#methods-div .optional_assignment {
+  color: gray;
+}
+#methods-div th {
+  text-align: left;
+  border-bottom: 1px black solid;
+  padding-right: 25px;
+}
+#methods-div td {
+  padding-right: 25px;
+}
+
