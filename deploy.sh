@@ -1,5 +1,6 @@
 #!/bin/bash
 cd `dirname $0`
+git push
 ORIGINAL_DIR=`pwd`
 cd `dirname $0`/../ansible
 source hacking/env-setup
