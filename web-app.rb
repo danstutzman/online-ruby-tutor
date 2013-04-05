@@ -35,6 +35,24 @@ def match(path, opts={}, &block)
   post(path, opts, &block)
 end
 
+def load_methods
+  YAML::load_file('ruby_composer.yaml')
+end
+
+def load_word_to_method_indexes(methods)
+  word_to_method_indexes = {}
+  methods.each_with_index do |method, method_index|
+    words = method.values.inject { |a, b| a += " #{b}" }.split(/[^a-z+=_*\/]/).reject { |s| s == '' }.sort.uniq
+    words.each { |word|
+      if word_to_method_indexes[word].nil?
+        word_to_method_indexes[word] = []
+      end
+      word_to_method_indexes[word].push method_index
+    }
+  end
+  word_to_method_indexes
+end
+
 get '/' do
   haml :index
 end
@@ -42,6 +60,8 @@ end
 post '/' do
   user_code = params['user_code_textarea']
   @traces = get_trace_for_cases(user_code, [{}])
+  @methods = load_methods
+  @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index
 end
 
@@ -89,6 +109,8 @@ match '/exercise/:exercise_num' do
       cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
       @traces = get_trace_for_cases(user_code, cases_given)
     end
+    @methods = load_methods
+    @word_to_method_indexes = load_word_to_method_indexes(@methods)
     haml :index
   else
     haml :login

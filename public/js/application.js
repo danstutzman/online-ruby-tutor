@@ -119,6 +119,47 @@ function assert(cond) {
       if ($('#traces-table').length == 0) {
         $('#trace_render_div0').show();
       }
+    } // end if traces_json defined
+
+    var max_method_index = 0;
+    for (var word in word_to_method_indexes) {
+      for (i in word_to_method_indexes[word]) {
+        var i2 = word_to_method_indexes[word][i];
+        if (i2 > max_method_index) {
+          max_method_index = i2;
+        }
+      }
     }
-  });
-})();
+
+    function handleFilterBySubstringKeydown(event) {
+      var text = document.getElementById('filter_by_substring').value;
+      var method_indexes_to_show = {};
+      if (text == '') {
+        for (var i = 0; i < max_method_index; i++) {
+          method_indexes_to_show[i] = true;
+        }
+      } else {
+        for (var word in word_to_method_indexes) {
+          if (word.indexOf(text) == 0) {
+            for (i in word_to_method_indexes[word]) {
+              var i2 = word_to_method_indexes[word][i];
+              method_indexes_to_show[i2] = true;
+            }
+          }
+        }
+      }
+
+      for (var i = 0; i < max_method_index; i++) {
+        var tr = document.getElementById('method_' + i);
+        var show_or_not = method_indexes_to_show[i];
+        tr.style.display = (show_or_not) ? 'table-row' : 'none';
+      }
+    }
+    document.getElementById('filter_by_substring').addEventListener(
+      'keydown', function(e) {
+        window.setTimeout(function() { handleFilterBySubstringKeydown(e) }, 1);
+      }
+   );
+
+  }); // end ready
+})(); // end immediate function

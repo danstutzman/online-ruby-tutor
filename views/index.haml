@@ -17,9 +17,14 @@
 
     %script(src='/js/application.js')
     %link(href='/css/application.css' rel='stylesheet' type='text/css')
-    - if @traces
-      %script
+    %script
+      - if @traces
         != "var traces_json = #{JSON.dump(@traces).inspect};"
+      - if @word_to_method_indexes
+        = "var word_to_method_indexes = {"
+        - @word_to_method_indexes.each do |word, method_indexes|
+          != "#{word.inspect}: #{method_indexes.inspect},"
+        = "1: 1 };"
   %body
     %form(method='post')
       - if @exercise
@@ -95,4 +100,4 @@
         %button#run-button(style='height:100%') Run code
 
       %hr
-      != erb :ruby_composer
+      != haml :ruby_composer

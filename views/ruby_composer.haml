@@ -1,0 +1,19 @@
+%input#filter_by_substring(type="text")
+%br
+#methods-div
+  %table
+    %tr
+      %th name
+      %th form
+      %th example
+      %th output
+      %th input
+    - @methods.each_with_index do |method, method_index|
+      %tr{:id => "method_#{method_index}"}
+        %td.name= method['name']
+        %td.form
+          %code= method['form'].gsub(/\b([is])\b/, '<u>\1</u>').gsub(%r[^(<u>i</u> = )], "<span class='optional-assignment'>\\1</span>")
+        %td.example
+          %code= method['example']
+        %td.output= method['output']
+        %td.input= method['input']
