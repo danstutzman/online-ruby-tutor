@@ -152,7 +152,7 @@ function assert(cond) {
 
      $('#edit-content').hide();
      $('.case-content').hide();
-     $('#trace_render_div' + case_num).show();
+     $('.case-content[data-case-num="' + case_num + '"]').show();
 
      $('#edit-tab').removeClass('selected');
      $('.case-tab').removeClass('selected');

@@ -62,4 +62,43 @@
 
       - if @traces
         - @traces.each_with_index do |trace, i|
-          .case-content{ :id => "trace_render_div#{i}" }
+          - _case = @exercise['cases'][i]
+          .case-content{ :"data-case-num" => i }
+            %ul
+            - if @exercise['description']
+              %li
+                %b Description:
+                = @exercise['description']
+
+            - if _case['given']
+              %li
+                %b Given:
+                %code= (_case['given'] || {}).map { |var, val| "#{var} = #{val}" }.join(', ')
+
+            - if _case['expected_return']
+              %li
+                %b Expected return:
+                = _case['expected_return'].inspect
+              %li
+                %b Actual return:
+                %code= trace['returned'].inspect
+
+            - elsif _case['expected_stdout']
+              %li
+                %b Expected output:
+                %pre(style='display:inline-block;vertical-align:top')
+                  = _case['expected_stdout']
+              %li
+                %b Actual output:
+                %pre(style='display:inline-block;vertical-align:top')
+                  = trace['trace'].last['stdout']
+
+            %li
+              %b Result:
+              - if trace['passed'] == true
+                .passed PASSED
+              - elsif trace['passed'] == false
+                .failed FAILED
+            %br
+
+            %div{ :id => "trace_render_div#{i}" }
