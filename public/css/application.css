@@ -97,7 +97,7 @@ body {
 }
 #edit-tab {
   border-top: none;
-  height: 80px;
+  height: 60px;
 }
 .filler {
   border-right: 1px black solid;
@@ -105,7 +105,7 @@ body {
   height:20px;
 }
 .filler-tall {
-  height: 60px;
+  height: 80px;
   width: 71px;
   padding-top: 290px;
   padding-left: 10px;

@@ -1,15 +1,15 @@
 1:
   description: "Print out the number 4"
   cases:
-  - expected_stdout: 4
+  - expected_stdout: "4"
 2:
   description: "Print out the number 5"
   cases:
-  - expected_stdout: 5
+  - expected_stdout: "5"
 3:
   description: "Print out the value of variable x"
   cases:
   - given: { x: 4 }
-    expected_stdout: 4
+    expected_stdout: "4"
   - given: { x: 5 }
-    expected_stdout: 5
+    expected_stdout: "5"

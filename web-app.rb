@@ -190,6 +190,13 @@ match '/exercise/:exercise_num' do
 
   cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
   @traces = get_trace_for_cases(@user_code, cases_given)
+  @traces.each_with_index do |trace, i|
+    if expected_return = @exercise['cases'][i]['expected_return']
+      trace['passed'] = (trace['returned'] == expected_return)
+    elsif expected_stdout = @exercise['cases'][i]['expected_stdout']
+      trace['passed'] = (trace['trace'].last['stdout'].chomp == expected_stdout)
+    end
+  end
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index

@@ -31,14 +31,23 @@
         %a#edit-tab-link(href='#')
           #edit-tab.tab
             %h2 Edit
-            %button Save
-            %button Run
+            %button(name='save' value='save')
+              Save and
+              %br
+              run tests
+
         .filler
         - @traces.each_with_index do |trace, i|
           %a.case-tab-link(href="#")
             .tab.case-tab{ :"data-case-num" => i }
               %h2
                 = "Case #{i}"
+                - if trace['passed'] == true
+                  %br
+                  .passed PASSED
+                - elsif trace['passed'] == false
+                  %br
+                  .failed FAILED
         .filler.filler-tall
           logged in as
           = @current_user && @current_user.first_name
