@@ -1,13 +1,49 @@
 div.ExecutionVisualizer table#pyCodeOutput {
   margin: 0 0;
 }
-table {
-  border-collapse: collapse;
-  margin: 20px 0;
+
+#methods-div {
+  overflow:scroll;
+  overflow-x:hidden;
+  height:200px;
+  width:100%;
+  margin-top: 25px;
 }
-th, td {
+#methods-div table {
+  border-collapse: collapse;
+  width: 100%;
+}
+#methods-div p {
+  background-color: gray;
+  color: white;
+  padding: 4px 2px 8px 5px;
+  margin: 0;
+}
+#methods-div #filter_by_substring {
+  float: right;
+  background: white url('/images/tiny_magnifying_glass.png') no-repeat 5px 4px;
+  padding: 3px 2px 4px 22px;
+  margin: 1px 2px 0 0;
+  border: none;
+  border-radius: 8px;
+}
+#methods-div th, td {
   padding: 0px 5px;
 }
+#methods-div td {
+  padding-right: 25px;
+}
+#methods-div th {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: left;
+  background-color: #ccc;
+  padding-right: 25px;
+}
+#methods-div .optional_assignment {
+  color: gray;
+}
+
 body {
   font-family: sans-serif;
 }
@@ -60,24 +96,6 @@ pre {
 }
 button.selected {
   border: 2px blue solid;
-}
-
-#methods-div {
-  overflow:scroll;
-  overflow-x:hidden;
-  height:200px;
-  width:100%;
-}
-#methods-div .optional_assignment {
-  color: gray;
-}
-#methods-div th {
-  text-align: left;
-  border-bottom: 1px black solid;
-  padding-right: 25px;
-}
-#methods-div td {
-  padding-right: 25px;
 }
 
 body {
