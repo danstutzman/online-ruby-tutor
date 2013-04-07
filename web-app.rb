@@ -11,15 +11,26 @@ require './get_trace_for.rb'
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
 CONFIG = YAML.load_file(config_path)
+
 env = ENV['RACK_ENV'] || 'development'
-if env == 'development'
-  db_params = CONFIG['DATABASE_PARAMS'][env]
-  ActiveRecord::Base.establish_connection(db_params)
+if env == 'production'
+  set :static_cache_control, [:public, :max_age => 300]
+  set :sass, { :style => :compressed }
+  # unicorn will connect to the database
 else
-  # load it in unicorn.rb
+  set :port, 4567
+  set :static_cache_control, [:public, :no_cache]
+  set :sass, { :style => :compact }
+  ActiveRecord::Base.establish_connection(CONFIG['DATABASE_PARAMS'][env])
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
 end
-ActiveRecord::Base.logger = Logger.new(STDOUT)
-ActiveRecord::Base.logger.formatter = proc { |sev, time, prog, msg| "#{msg}\n" }
+set :public_folder, 'public'
+set :haml, { :format => :html5, :escape_html => true, :ugly => true }
+
+use Rack::Session::Cookie, {
+  :key => 'rack.session',
+  :secret => CONFIG['COOKIE_SIGNING_SECRET'],
+}
 
 exercises_path = File.join(File.dirname(__FILE__), 'exercises.yaml')
 EXERCISES = YAML.load_file(exercises_path)
@@ -29,16 +40,6 @@ end
 
 class Save < ActiveRecord::Base
 end
-
-use Rack::Session::Cookie, {
-  :key => 'rack.session',
-  :secret => CONFIG['COOKIE_SIGNING_SECRET'],
-}
-
-set :port, 4567
-set :public_folder, 'public'
-set :static_cache_control, [:public, :no_cache]
-set :haml, { :format => :html5, :escape_html => true, :ugly => true }
 
 def authenticated?
   @current_user =
@@ -200,6 +201,10 @@ match '/exercise/:exercise_num' do
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index
+end
+
+get '/css/application.css' do
+  sass 'sass/application'.intern
 end
 
 after do

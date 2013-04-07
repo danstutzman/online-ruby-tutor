@@ -1,0 +1,139 @@
+div.ExecutionVisualizer table#pyCodeOutput
+  margin: 0 0
+
+#methods-div
+  overflow: scroll
+  overflow-x: hidden
+  height: 200px
+  width: 100%
+  margin-top: 25px
+#methods-div table
+  border-collapse: collapse
+  width: 100%
+#methods-div p
+  background-color: gray
+  color: white
+  padding: 4px 2px 8px 5px
+  margin: 0
+#methods-div #filter_by_substring
+  float: right
+  background: white url('/images/tiny_magnifying_glass.png') no-repeat 5px 4px
+  padding: 3px 2px 4px 22px
+  margin: 1px 2px 0 0
+  border: none
+  border-radius: 8px
+#methods-div th, td
+  padding: 0px 5px
+#methods-div td
+  padding-right: 25px
+#methods-div th
+  padding-top: 3px
+  padding-bottom: 3px
+  text-align: left
+  background-color: #ccc
+  padding-right: 25px
+#methods-div .optional_assignment
+  color: gray
+
+body
+  font-family: sans-serif
+tr.headers th
+  background-color: gray
+  color: white
+  border-top: 1px black solid
+  border-right: 1px black solid
+#traces-table
+  cursor: pointer
+
+#traces-table tr.selectedRow
+  background-color: #00d
+  color: white
+  font-weight: bold
+.failed
+  color: red
+  display: inline-block
+  width: 60px
+.passed
+  color: green
+  display: inline-block
+  width: 60px
+pre
+  margin: 0
+  padding: 0
+.stringObj
+  background-color: #ddd
+#traces-table tr.headers th.action-buttons
+  background-color: transparent
+  color: black
+  font-weight: normal
+  border: none
+#traces-table td
+  vertical-align: top
+  border-left: 1px black solid
+  border-right: 1px black solid
+  border-bottom: 1px black solid
+  padding: 5px 8px
+.CodeMirror
+  font-family: "Andale mono", monospace
+button.selected
+  border: 2px blue solid
+
+body
+  margin: 0
+#sidebar
+  width: 90px
+  float: left
+  background-color: #eee
+.tab
+  border: 1px black solid
+  padding: 10px
+  width: 60px
+  margin-left: 10px
+  background-color: #eee
+#edit-tab
+  border-top: none
+  height: 60px
+.filler
+  border-right: 1px black solid
+  width: 91px
+  height: 20px
+.filler-tall
+  height: 80px
+  width: 71px
+  padding-top: 290px
+  padding-left: 10px
+  padding-right: 10px
+.case-tab
+  height: 40px
+#edit-content
+  margin-left: 95px
+  padding: 10px
+.case-content
+  margin-left: 95px
+  padding: 10px
+#sidebar a
+  text-decoration: none
+.tab h2
+  margin: 0
+  padding: 0
+  font-size: 12pt
+  color: black
+  font-weight: bold
+  text-align: center
+.tab button
+  -webkit-appearance: square-button
+  width: 60px
+  border: none
+  padding: 5px
+  margin-top: 5px
+.tab.selected
+  border-right: none
+  background-color: #fff
+.CodeMirror-gutter
+  background-color: white
+  border: none
+.CodeMirror
+  border: 1px #ccc solid
+  border-top: 1px #888 solid
+.ExecutionVisualizer > table
+  margin-top: 0
