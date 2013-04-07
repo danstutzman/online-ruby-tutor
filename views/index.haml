@@ -61,7 +61,7 @@
             = @user_code
         != haml :ruby_composer
 
-      - if @traces
+      - if @traces && @exercise
         - @traces.each_with_index do |trace, i|
           - _case = @exercise['cases'][i]
           .case-content{ :"data-case-num" => i }
