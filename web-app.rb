@@ -207,6 +207,10 @@ get '/css/application.css' do
   sass 'sass/application'.intern
 end
 
+get '/js/application.js' do
+  coffee 'coffee/application'.intern
+end
+
 after do
   ActiveRecord::Base.clear_active_connections!
 end
