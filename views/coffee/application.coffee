@@ -27,7 +27,7 @@ changePythonToRuby = ->
     s = this
     sNode = s.childNodes[0]
     if sNode
-      sNode.nodeValue = sNode.nodeValue.replace(/^'([\s\S]*)'$/, '$1')
+      sNode.nodeValue = sNode.nodeValue.replace(/^"([\s\S]*)"$/, '$1')
       s.innerHTML = sNode.nodeValue.replace(/\\'/g, '\'')
       s.innerHTML = sNode.nodeValue.replace(/\n/g, '<br>')
 
