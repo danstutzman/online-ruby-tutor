@@ -172,7 +172,6 @@ end
 def get_trace_for_case(___user_code, ___assignments)
   $___user_code_num_lines = ___user_code.chomp.split("\n").size
   $___num_instructions_so_far = 0
-  exception_frame = nil
   begin
     returned = nil
     Timeout::timeout($___MAX_SECONDS_TO_COMPLETE) do
@@ -185,24 +184,36 @@ def get_trace_for_case(___user_code, ___assignments)
     end
   rescue Timeout::Error => e
     set_trace_func nil
-    exception_frame = {
+    $__traces.push({
       'exception_msg' => "(timeout)",
       'event' => 'instruction_limit_reached',
-    }
+    })
     returned = e
   rescue InstructionLimitReached => e
-    exception_frame = {
+    $__traces.push({
       'exception_msg' => "(stopped after #{$___MAX_INSTRUCTIONS_LIMIT} steps to prevent possible infinite loop)",
       'event' => 'instruction_limit_reached',
-    }
+    })
     returned = e
-  rescue StandardError, SecurityError => e
+  rescue StandardError, SecurityError, SyntaxError => e
     line_num = nil
-    if e.backtrace && e.backtrace[1]
-      line_num = e.backtrace[1].split(':')[1].to_i - $___NUM_PREFIX_LINES
+    exception_msg = "#{e} (#{e.class})"
+    if match = e.to_s.match(/\(eval\):([0-9]+):(.*)/)
+      line_num = match[1].to_i - $___NUM_PREFIX_LINES
+      if line_num > $___user_code_num_lines
+        line_num = $___user_code_num_lines
+      end
+ 
+      # fudge the line number
+      exception_msg = e.to_s.gsub(":#{match[1]}:", ":#{line_num}:")
+      exception_msg = "#{exception_msg} (#{e.class})"
+    elsif e.backtrace && e.backtrace[1] &&
+      match = e.backtrace[1].match(/\(eval\):([0-9]+):in `<module:UserCode>'/)
+      line_num = match[1].to_i - $___NUM_PREFIX_LINES
     end
-    exception_frame = ($___traces.last && $___traces.last.clone) || {}
-    exception_frame['exception_msg'] = "#{e} (#{e.class})"
+    $___traces.push({}) if $___traces.size == 0
+    exception_frame = $___traces.last
+    exception_frame['exception_msg'] = exception_msg
     exception_frame['line'] = line_num
     exception_frame['event'] = 'uncaught_exception'
     exception_frame['offset'] = 1
@@ -210,7 +221,7 @@ def get_trace_for_case(___user_code, ___assignments)
   end
   {
     'code' => ___user_code,
-    'trace' => $___traces + (exception_frame ? [exception_frame] : []),
+    'trace' => $___traces,
     'returned' => returned,
   }
 end
