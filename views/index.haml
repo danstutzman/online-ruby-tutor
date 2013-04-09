@@ -39,7 +39,7 @@
           %a.case-tab-link(href="#")
             .tab.case-tab{ :"data-case-num" => i }
               %h2
-                = "Case #{i}"
+                = @exercise ? "Case #{i}" : 'Debug'
                 - if trace['passed'] == true
                   %br
                   .passed PASSED
@@ -58,10 +58,10 @@
             = @user_code
         != haml :ruby_composer
 
-      - if @traces && @exercise
-        - @traces.each_with_index do |trace, i|
-          - _case = @exercise['cases'][i]
-          .case-content{ :"data-case-num" => i }
+      - (@traces || []).each_with_index do |trace, i|
+        .case-content{ :"data-case-num" => i }
+          - if @exercise
+            - _case = @exercise['cases'][i]
             %ul
             - if @exercise['description']
               %li
@@ -99,4 +99,4 @@
                 .failed FAILED
             %br
 
-            %div{ :id => "trace_render_div#{i}" }
+          %div{ :id => "trace_render_div#{i}" }
