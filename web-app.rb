@@ -197,7 +197,8 @@ match '/exercise/:exercise_num' do
     if expected_return = @exercise['cases'][i]['expected_return']
       trace['passed'] = (trace['returned'] == expected_return)
     elsif expected_stdout = @exercise['cases'][i]['expected_stdout']
-      trace['passed'] = (trace['trace'].last['stdout'].chomp == expected_stdout)
+      trace['passed'] =
+        ((trace['trace'].last['stdout'] || '').chomp == expected_stdout)
     end
   end
   @methods = load_methods
