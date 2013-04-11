@@ -12,6 +12,10 @@ GEM
     activesupport (3.2.13)
       i18n (= 0.6.1)
       multi_json (~> 1.0)
+    airbrake (3.1.11)
+      activesupport
+      builder
+      json
     arel (3.0.2)
     builder (3.0.4)
     coffee-script (2.2.0)
@@ -28,6 +32,7 @@ GEM
     hashie (1.2.0)
     httpauth (0.2.0)
     i18n (0.6.1)
+    json (1.7.7)
     jwt (0.1.7)
       multi_json (>= 1.5)
     kgio (2.8.0)
@@ -71,6 +76,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  airbrake
   coffee-script
   erubis
   haml

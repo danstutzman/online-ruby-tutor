@@ -9,6 +9,7 @@ require 'sass'
 require 'haml'
 require 'coffee_script'
 require 'active_record'
+require 'airbrake'
 require './get_trace_for.rb'
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
@@ -18,7 +19,8 @@ env = ENV['RACK_ENV'] || 'development'
 if env == 'production'
   set :static_cache_control, [:public, :max_age => 300]
   set :sass, { :style => :compressed }
-  # unicorn will connect to the database
+  Airbrake.configure { |config| config.api_key = CONFIG['AIRBRAKE_API_KEY'] }
+  nil # unicorn will connect to the database
 else
   set :port, 4567
   set :static_cache_control, [:public, :no_cache]
@@ -33,6 +35,15 @@ use Rack::Session::Cookie, {
   :key => 'rack.session',
   :secret => CONFIG['COOKIE_SIGNING_SECRET'],
 }
+
+use OmniAuth::Builder do
+  provider :google_oauth2, CONFIG['GOOGLE_KEY'], CONFIG['GOOGLE_SECRET'], {
+    :scope => 'https://www.googleapis.com/auth/plus.me',
+    :access_type => 'online',
+  }
+end
+
+use Airbrake::Sinatra
 
 exercises_path = File.join(File.dirname(__FILE__), 'exercises.yaml')
 EXERCISES = YAML.load_file(exercises_path)
@@ -116,13 +127,6 @@ post '/' do
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   haml :index
-end
-
-use OmniAuth::Builder do
-  provider :google_oauth2, CONFIG['GOOGLE_KEY'], CONFIG['GOOGLE_SECRET'], {
-    :scope => 'https://www.googleapis.com/auth/plus.me',
-    :access_type => 'online',
-  }
 end
 
 # Example callback:
