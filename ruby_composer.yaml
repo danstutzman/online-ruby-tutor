@@ -39,9 +39,23 @@
   output: number
   inputs: number, number
 -
-  name: convert number to string
-  form: strvar = num.to_s
+  name: convert object to string
+  form: strvar = obj.to_s
   example: age_string = age.to_s
+  output: string
+  inputs: object
+-
+  name: convert object to string
+  tags: interpolation, hash, curly, braces
+  form: "strvar = \"#{obj}\""
+  example: "age_string = \"#{age}\""
+  output: string
+  inputs: object
+-
+  name: convert number to string with 2 decimal places
+  tags: percent, sprintf, printf, format
+  form: "strvar = \"%.2f\" % num"
+  example: "total_str = \"%.2f\" % total"
   output: string
   inputs: number
 -
