@@ -12,6 +12,7 @@
           %option(value='string') strings(s)
         %select#i-need
           %option(value='') I need...
+          %option(value='bool') bool
           %option(value='number') number
           %option(value='output') output
           %option(value='statements') run statements
@@ -26,6 +27,6 @@
       %tr{:id => "method_#{method_index}"}
         %td.name= method['name']
         %td.form
-          %code!= method['form'].gsub(/\b(numvar|num|strvar|str|statements|bool|obj)\b/, '<u>\1</u>').gsub(%r[^(<u>(numvar|strvar)</u> = )], "<span class='optional-assignment'>\\1</span>").gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }
+          %code!= method['form'].gsub(%r[(^numvar =|^strvar =|^\(if\) |\.\.\.)], "<span class='optional-assignment'>\\1</span>").gsub(%r[>\(if\) <], ">if <").gsub(/\b(numvar|num|strvar|str|statements|bool|obj)\b/, '<u>\1</u>').gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }
         %td.example
           %code!= method['example'].gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }
