@@ -68,21 +68,21 @@
   inputs: object
 -
   name: conditional branching (1 leg)
-  tags: if else elsif then
+  tags: then
   form: "if bool\n  statements\nend"
   example: "if n > 0\n  puts \"positive\"\nend"
   output: statements
   inputs: bool, statements
 -
   name: conditional branching (2 legs)
-  tags: if else elsif then
+  tags: then otherwise
   form: "if bool\n  statements\nelse\n  statements\nend"
   example: "if n > 0\n  puts \"positive\"\nelse\n  puts \"non-positive\"\nend"
   output: statements
   inputs: bool, statements
 -
   name: conditional branching (3+ legs)
-  tags: if else elsif then
+  tags: then otherwise
   form: "if bool\n  statements\nelsif bool\n  statements\nelse\n  statements\nend"
   example: "if n > 0\n  puts \"positive\"\nelsif n < 0\n  puts \"negative\"\nelse\n  puts \"zero\"\nend"
   output: statements
