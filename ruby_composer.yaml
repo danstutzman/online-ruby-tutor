@@ -32,7 +32,7 @@
   output: number
   inputs: number, number
 -
-  name: division (no remainder if both inputs are integers)
+  name: division (no remainder if both integers)
   tags: divide
   form: numvar = num / num
   example: estimate_per_line = total / num_lines
@@ -52,7 +52,7 @@
   output: string
   inputs: object
 -
-  name: convert number to string with 2 decimal places
+  name: convert number to string (2 decimal places)
   tags: percent, sprintf, printf, format
   form: "strvar = \"%.2f\" % num"
   example: "total_str = \"%.2f\" % total"
