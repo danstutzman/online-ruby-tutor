@@ -52,6 +52,10 @@
           %button(name='logout' value='logout') Logout
 
       #edit-content
+        - if params['exercise_num']
+          %b= "Exercise #{params['exercise_num']}"
+        - if @exercise && @exercise['description']
+          = @exercise['description']
         #user_code_div
           %textarea#user_code_textarea(name='user_code_textarea'
                                        cols='40' rows='10')
@@ -60,43 +64,45 @@
 
       - (@traces || []).each_with_index do |trace, i|
         .case-content{ :"data-case-num" => i }
+          - if params['exercise_num']
+            %b= "Exercise #{params['exercise_num']}"
+          - if @exercise && @exercise['description']
+            = @exercise['description']
+
           - if @exercise && @exercise['cases'] && @exercise['cases'][i]
             - _case = @exercise['cases'][i]
             %ul
-            - if @exercise['description']
               %li
-                %b Description:
-                = @exercise['description']
+                %b Case number:
+                = i
+              - if _case['given']
+                %li
+                  %b Given:
+                  %code= (_case['given'] || {}).map { |var, val| "#{var} = #{val}" }.join(', ')
 
-            - if _case['given']
-              %li
-                %b Given:
-                %code= (_case['given'] || {}).map { |var, val| "#{var} = #{val}" }.join(', ')
+              - if _case['expected_return']
+                %li
+                  %b Expected return:
+                  = _case['expected_return'].inspect
+                %li
+                  %b Actual return:
+                  %code= trace['returned'].inspect
 
-            - if _case['expected_return']
-              %li
-                %b Expected return:
-                = _case['expected_return'].inspect
-              %li
-                %b Actual return:
-                %code= trace['returned'].inspect
+              - elsif _case['expected_stdout']
+                %li
+                  %b Expected output:
+                  %pre(style='display:inline-block;vertical-align:top')
+                    = _case['expected_stdout']
+                %li
+                  %b Actual output:
+                  %pre(style='display:inline-block;vertical-align:top')
+                    = trace['trace'].last['stdout']
 
-            - elsif _case['expected_stdout']
               %li
-                %b Expected output:
-                %pre(style='display:inline-block;vertical-align:top')
-                  = _case['expected_stdout']
-              %li
-                %b Actual output:
-                %pre(style='display:inline-block;vertical-align:top')
-                  = trace['trace'].last['stdout']
-
-            %li
-              %b Result:
-              - if trace['passed'] == true
-                .passed PASSED
-              - elsif trace['passed'] == false
-                .failed FAILED
-            %br
+                %b Result:
+                - if trace['passed'] == true
+                  .passed PASSED
+                - elsif trace['passed'] == false
+                  .failed FAILED
 
           %div{ :id => "trace_render_div#{i}" }
