@@ -85,11 +85,12 @@ end
 def load_i_have_to_method_indexes(methods)
   word_to_method_indexes = {}
   methods.each_with_index do |method, method_index|
-    i_have = method['input']
-    if word_to_method_indexes[i_have].nil?
-      word_to_method_indexes[i_have] = []
+    method['inputs'].split(', ').each do |i_have|
+      if word_to_method_indexes[i_have].nil?
+        word_to_method_indexes[i_have] = []
+      end
+      word_to_method_indexes[i_have].push method_index
     end
-    word_to_method_indexes[i_have].push method_index
   end
   word_to_method_indexes
 end

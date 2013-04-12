@@ -3,45 +3,87 @@
   form: intvar = int
   example: seconds_in_hour = 3600
   output: integer
-  input: ""
+  inputs: ""
 -
   name: addition
   tags: plus
   form: intvar = int + int
   example: assets = liabilities + equity
   output: integer
-  input: integers
+  inputs: integer, integer
 -
   name: subtraction
   tags: minus
   form: intvar = int - int
   example: equity = assets - liabilities
   output: integer
-  input: integers
+  inputs: integer, integer
 -
   name: multiplication
   tags: multiply, times
   form: intvar = int * int
   example: total = num_lines * price_per_line
   output: integer
-  input: integers
+  inputs: integer, integer
 -
   name: division without remainder
   tags: divide
   form: intvar = int / int
   example: estimate_per_line = total / num_lines
   output: integer
-  input: integers
+  inputs: integer, integer
 -
   name: convert integer to string
   form: strvar = int.to_s
   example: age_string = age.to_s
   output: string
-  input: integer
+  inputs: integer
 -
   name: add to integer variable
   tags: increment, plus
   form: intvar += int
   example: total_charge += line_charge
   output: integer
-  input: integer
+  inputs: integer
+-
+  name: "output object + newline"
+  tags: print
+  form: puts obj
+  example: puts first_name
+  output: output
+  inputs: object
+-
+  name: output object
+  tags: print
+  form: print obj
+  example: 'print "#{first_name}\n"'
+  output: output
+  inputs: object
+-
+  name: "output object.inspect + newline"
+  tags: print inspect
+  form: p obj
+  example: 'p first_name'
+  output: output
+  inputs: object
+-
+  name: conditional branching (1 leg)
+  tags: if else elsif then
+  form: "if bool\n  statements\nend"
+  example: "if n > 0\n  puts \"positive\"\nend"
+  output: statements
+  inputs: bool, statements
+-
+  name: conditional branching (2 legs)
+  tags: if else elsif then
+  form: "if bool\n  statements\nelse\n  statements\nend"
+  example: "if n > 0\n  puts \"positive\"\nelse\n  puts \"non-positive\"\nend"
+  output: statements
+  inputs: bool, statements
+-
+  name: conditional branching (3+ legs)
+  tags: if else elsif then
+  form: "if bool\n  statements\nelsif bool\n  statements\nelse\n  statements\nend"
+  example: "if n > 0\n  puts \"positive\"\nelsif n < 0\n  puts \"negative\"\nelse\n  puts \"zero\"\nend"
+  output: statements
+  inputs: bool, statements

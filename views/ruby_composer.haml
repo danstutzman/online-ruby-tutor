@@ -6,11 +6,15 @@
       %th
         %select#i-have
           %option(value='') I have...
+          %option(value='bool') bool
           %option(value='integer') integer(s)
+          %option(value='statements') statement(s)
           %option(value='string') strings(s)
         %select#i-need
           %option(value='') I need...
           %option(value='integer') integer
+          %option(value='output') output
+          %option(value='statements') run statements
           %option(value='string') string
       %th
         %input#filter_by_substring(type='text' placeholder='Filter')
@@ -22,6 +26,6 @@
       %tr{:id => "method_#{method_index}"}
         %td.name= method['name']
         %td.form
-          %code!= method['form'].gsub(/\b(intvar|int|strvar|str)\b/, '<u>\1</u>').gsub(%r[^(<u>(intvar|strvar)</u> = )], "<span class='optional-assignment'>\\1</span>")
+          %code!= method['form'].gsub(/\b(intvar|int|strvar|str|statements|bool|obj)\b/, '<u>\1</u>').gsub(%r[^(<u>(intvar|strvar)</u> = )], "<span class='optional-assignment'>\\1</span>").gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }
         %td.example
-          %code= method['example']
+          %code!= method['example'].gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }

@@ -69,6 +69,10 @@ filterMethodsByIHave = (old_method_indexes_to_show) ->
     for method_index in (i_have_to_method_indexes["#{input}s"] || [])
       if old_method_indexes_to_show[method_index]
         new_method_indexes_to_show[method_index] = true
+    if input isnt 'statements'
+      for method_index in (i_have_to_method_indexes['object'] || [])
+        if old_method_indexes_to_show[method_index]
+          new_method_indexes_to_show[method_index] = true
     new_method_indexes_to_show
 
 filterMethodsByINeed = (old_method_indexes_to_show) ->
