@@ -3,14 +3,23 @@
   cases:
   - expected_stdout: "42"
 15:
-  description: "Print out the number 123"
+  description: "Print out 1, 2, and 3 on separate lines"
   cases:
-  - expected_stdout: "123"
+  - expected_stdout: "1\n2\n3"
+18:
+  description: "Multiply 17 by 31 and print the answer"
+  starting_code: "puts 17 * 31"
 16:
   description: "Example of assignment"
-  starting_code: "a = 5\nprint a"
+  starting_code: "a = 5\nputs a"
+17:
+  description: "Another example of assignment"
+  starting_code: "m = 2\nb = -5\nx = 3\ny = m * x + b\nputs y"
+19:
+  description: "Example of variable name with underscores"
+  starting_code: "price_of_cabbage_in_usd_per_lb = 0.55\nputs price_of_cabbage_in_usd_per_lb"
 3:
-  description: "Print out the value of variable x"
+  description: "Print out the value of the given variable x"
   cases:
   - given: { x: 4 }
     expected_stdout: "4"
