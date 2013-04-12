@@ -1,50 +1,56 @@
 -
   name: integer literal
-  form: intvar = int
+  form: numvar = num
   example: seconds_in_hour = 3600
-  output: integer
-  inputs: ""
+  output: number
+  inputs: number
+-
+  name: float literal
+  form: numvar = num
+  example: pi = 3.14
+  output: number
+  inputs: number
 -
   name: addition
   tags: plus
-  form: intvar = int + int
+  form: numvar = num + num
   example: assets = liabilities + equity
-  output: integer
-  inputs: integer, integer
+  output: number
+  inputs: number, number
 -
   name: subtraction
   tags: minus
-  form: intvar = int - int
+  form: numvar = num - num
   example: equity = assets - liabilities
-  output: integer
-  inputs: integer, integer
+  output: number
+  inputs: number, number
 -
   name: multiplication
   tags: multiply, times
-  form: intvar = int * int
+  form: numvar = num * num
   example: total = num_lines * price_per_line
-  output: integer
-  inputs: integer, integer
+  output: number
+  inputs: number, number
 -
-  name: division without remainder
+  name: division (no remainder if both inputs are integers)
   tags: divide
-  form: intvar = int / int
+  form: numvar = num / num
   example: estimate_per_line = total / num_lines
-  output: integer
-  inputs: integer, integer
+  output: number
+  inputs: number, number
 -
-  name: convert integer to string
-  form: strvar = int.to_s
+  name: convert number to string
+  form: strvar = num.to_s
   example: age_string = age.to_s
   output: string
-  inputs: integer
+  inputs: number
 -
-  name: add to integer variable
+  name: add to number variable
   tags: increment, plus
-  form: intvar += int
+  form: numvar += num
   example: total_charge += line_charge
-  output: integer
-  inputs: integer
+  output: number
+  inputs: number
 -
   name: "output object + newline"
   tags: print
