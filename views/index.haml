@@ -39,7 +39,7 @@
           %a.case-tab-link(href="#")
             .tab.case-tab{ :"data-case-num" => i }
               %h2
-                = @exercise ? "Case #{i}" : 'Debug'
+                = (@exercise && @exercise['cases']) ? "Case #{i}" : 'Debug'
                 - if trace['passed'] == true
                   %br
                   .passed PASSED
@@ -60,7 +60,7 @@
 
       - (@traces || []).each_with_index do |trace, i|
         .case-content{ :"data-case-num" => i }
-          - if @exercise
+          - if @exercise && @exercise['cases'] && @exercise['cases'][i]
             - _case = @exercise['cases'][i]
             %ul
             - if @exercise['description']

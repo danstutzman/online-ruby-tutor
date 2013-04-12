@@ -1,11 +1,14 @@
-1:
-  description: "Print out the number 4"
+14:
+  description: "Print out the number 42"
   cases:
-  - expected_stdout: "4"
-2:
-  description: "Print out the number 5"
+  - expected_stdout: "42"
+15:
+  description: "Print out the number 123"
   cases:
-  - expected_stdout: "5"
+  - expected_stdout: "123"
+16:
+  description: "Example of assignment"
+  starting_code: "a = 5\nprint a"
 3:
   description: "Print out the value of variable x"
   cases:

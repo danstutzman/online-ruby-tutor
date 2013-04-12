@@ -177,7 +177,11 @@ match '/exercise/:exercise_num' do
         :exercise_num => params['exercise_num'],
         :is_current   => true
       }).first
-    @user_code = (old_record || Save.new).code || ''
+    if old_record
+      @user_code = old_record.code
+    else
+      @user_code = @exercise['starting_code'] || ''
+    end
   elsif request.post?
     @user_code = params['user_code_textarea']
     Save.transaction do
@@ -195,10 +199,13 @@ match '/exercise/:exercise_num' do
     end
   end
 
-  cases_given = @exercise['cases'].map { |_case| _case['given'] || {} }
+  cases_given =
+    (@exercise['cases'] || [{}]).map { |_case| _case['given'] || {} }
   @traces = get_trace_for_cases(@user_code, cases_given)
   @traces.each_with_index do |trace, i|
-    if expected_return = @exercise['cases'][i]['expected_return']
+    if @exercise['cases'].nil? || @exercise['cases'][i].nil?
+      nil # cases don't apply to this exercise
+    elsif expected_return = @exercise['cases'][i]['expected_return']
       trace['passed'] = (trace['returned'] == expected_return)
     elsif expected_stdout = @exercise['cases'][i]['expected_stdout']
       trace['passed'] =
