@@ -36,27 +36,67 @@ changePythonToRuby = ->
     $('#user_code_div').show()
 
 max_method_index = 0
-handleFilterBySubstringKeydown = (event) ->
-  text = document.getElementById('filter_by_substring').value
-  method_indexes_to_show = {}
-  if text is ''
-    i = 0
-    while i < max_method_index
-      method_indexes_to_show[i] = true
-      i++
-  else
-    for word of word_to_method_indexes
-      if word.indexOf(text) is 0
-        for i of word_to_method_indexes[word]
-          i2 = word_to_method_indexes[word][i]
-          method_indexes_to_show[i2] = true
-
+showAllMethods = ->
   i = 0
   while i < max_method_index
-    tr = document.getElementById("method_#{i}")
-    show_or_not = method_indexes_to_show[i]
-    tr.style.display = (if (show_or_not) then 'table-row' else 'none')
+    tr = $("#method_#{i}")
+    tr.show()
     i++
+
+filterMethodsByText = (old_method_indexes_to_show) ->
+  textFilter = $('#filter_by_substring').val()
+  if textFilter is ''
+    old_method_indexes_to_show
+  else
+    new_method_indexes_to_show = {}
+    for word of word_to_method_indexes
+      if word.indexOf(textFilter) is 0
+        for i of word_to_method_indexes[word]
+          method_index = word_to_method_indexes[word][i]
+          if old_method_indexes_to_show[method_index]
+            new_method_indexes_to_show[method_index] = true
+    new_method_indexes_to_show
+
+filterMethodsByIHave = (old_method_indexes_to_show) ->
+  input = $('#i-have').val()
+  if input is ''
+    old_method_indexes_to_show
+  else
+    new_method_indexes_to_show = {}
+    for method_index in (i_have_to_method_indexes[input] || [])
+      if old_method_indexes_to_show[method_index]
+        new_method_indexes_to_show[method_index] = true
+    for method_index in (i_have_to_method_indexes["#{input}s"] || [])
+      if old_method_indexes_to_show[method_index]
+        new_method_indexes_to_show[method_index] = true
+    new_method_indexes_to_show
+
+filterMethodsByINeed = (old_method_indexes_to_show) ->
+  input = $('#i-need').val()
+  if input is ''
+    old_method_indexes_to_show
+  else
+    new_method_indexes_to_show = {}
+    for method_index in (i_need_to_method_indexes[input] || [])
+      if old_method_indexes_to_show[method_index]
+        new_method_indexes_to_show[method_index] = true
+    for method_index in (i_need_to_method_indexes["#{input}s"] || [])
+      if old_method_indexes_to_show[method_index]
+        new_method_indexes_to_show[method_index] = true
+    new_method_indexes_to_show
+
+handleFilters = (event) ->
+  method_indexes_to_show = {}
+  for i in [0..max_method_index]
+    method_indexes_to_show[i] = true
+
+  method_indexes_to_show = filterMethodsByText(method_indexes_to_show)
+  method_indexes_to_show = filterMethodsByIHave(method_indexes_to_show)
+  method_indexes_to_show = filterMethodsByINeed(method_indexes_to_show)
+
+  for i in [0..max_method_index]
+    tr = $("#method_#{i}")
+    if method_indexes_to_show[i] then tr.show() else tr.hide()
 
 $(document).ready ->
   
@@ -103,8 +143,13 @@ $(document).ready ->
       i2 = word_to_method_indexes[word][i]
       if i2 > max_method_index
         max_method_index = i2
-  document.getElementById('filter_by_substring').addEventListener 'keydown', (e) ->
-    window.setTimeout (-> handleFilterBySubstringKeydown e), 1
+
+  $('#filter_by_substring').keydown (e) ->
+    window.setTimeout (-> handleFilters e), 1
+  $('#i-have').change (e) ->
+    handleFilters(e)
+  $('#i-need').change (e) ->
+    handleFilters(e)
 
   $('#edit-tab').addClass 'selected'
   $('.case-content').hide()

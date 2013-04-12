@@ -82,6 +82,41 @@ def load_word_to_method_indexes(methods)
   word_to_method_indexes
 end
 
+def load_i_have_to_method_indexes(methods)
+  word_to_method_indexes = {}
+  methods.each_with_index do |method, method_index|
+    i_have = method['input']
+    if word_to_method_indexes[i_have].nil?
+      word_to_method_indexes[i_have] = []
+    end
+    word_to_method_indexes[i_have].push method_index
+  end
+  word_to_method_indexes
+end
+
+def load_i_need_to_method_indexes(methods)
+  word_to_method_indexes = {}
+  methods.each_with_index do |method, method_index|
+    i_need = method['output']
+    if word_to_method_indexes[i_need].nil?
+      word_to_method_indexes[i_need] = []
+    end
+    word_to_method_indexes[i_need].push method_index
+  end
+  word_to_method_indexes
+end
+
+helpers do
+  def create_javascript_var(var_name, var_value)
+    js = "var #{var_name} = {"
+    var_value.each do |key, value|
+      js += "#{key.inspect}: #{value.inspect},"
+    end
+    js += "1: 1 };"
+    js
+  end
+end
+
 before do
   if ['/auth/google_oauth2/callback', '/auth/failure', '/login'].include?(request.path_info)
     pass
@@ -101,6 +136,8 @@ get '/' do
   @traces = get_trace_for_cases(@user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
+  @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
+  @i_need_to_method_indexes = load_i_need_to_method_indexes(@methods)
   haml :index
 end
 
@@ -126,6 +163,8 @@ post '/' do
   @traces = get_trace_for_cases(@user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
+  @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
+  @i_need_to_method_indexes = load_i_need_to_method_indexes(@methods)
   haml :index
 end
 
@@ -214,6 +253,8 @@ match '/exercise/:exercise_num' do
   end
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
+  @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
+  @i_need_to_method_indexes = load_i_need_to_method_indexes(@methods)
   haml :index
 end
 

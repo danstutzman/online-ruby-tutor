@@ -18,11 +18,9 @@
     %script
       - if @traces
         != "var traces_json = #{JSON.dump(@traces).inspect};"
-      - if @word_to_method_indexes
-        = "var word_to_method_indexes = {"
-        - @word_to_method_indexes.each do |word, method_indexes|
-          != "#{word.inspect}: #{method_indexes.inspect},"
-        = "1: 1 };"
+      != create_javascript_var('word_to_method_indexes', @word_to_method_indexes)
+      != create_javascript_var('i_have_to_method_indexes', @i_have_to_method_indexes)
+      != create_javascript_var('i_need_to_method_indexes', @i_need_to_method_indexes)
   %body
     %form(method='post')
       #sidebar

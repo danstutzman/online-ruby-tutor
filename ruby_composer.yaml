@@ -1,47 +1,47 @@
 -
   name: integer literal
-  form: i = i
+  form: intvar = int
   example: seconds_in_hour = 3600
   output: integer
   input: ""
 -
   name: addition
   tags: plus
-  form: i = i + i
+  form: intvar = int + int
   example: assets = liabilities + equity
   output: integer
   input: integers
 -
   name: subtraction
   tags: minus
-  form: i = i - i
+  form: intvar = int - int
   example: equity = assets - liabilities
   output: integer
   input: integers
 -
   name: multiplication
   tags: multiply, times
-  form: i = i * i
+  form: intvar = int * int
   example: total = num_lines * price_per_line
   output: integer
   input: integers
 -
   name: division without remainder
   tags: divide
-  form: i = i / i
+  form: intvar = int / int
   example: estimate_per_line = total / num_lines
   output: integer
   input: integers
 -
   name: convert integer to string
-  form: i = i.to_s
+  form: strvar = int.to_s
   example: age_string = age.to_s
   output: string
   input: integer
 -
   name: add to integer variable
   tags: increment, plus
-  form: i += i
+  form: intvar += int
   example: total_charge += line_charge
   output: integer
   input: integer

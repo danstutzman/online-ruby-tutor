@@ -9,21 +9,14 @@
     border-collapse: collapse
     width: 100%
 
-  > p
+  tr.filters th
     background-color: gray
     color: white
-    padding: 4px 2px 8px 5px
+    padding: 4px 2px 4px 5px
+    text-align: left
     margin: 0
 
-  #filter_by_substring
-    float: right
-    background: white url('/images/tiny_magnifying_glass.png') no-repeat 5px 4px
-    padding: 3px 2px 4px 22px
-    margin: 1px 2px 0 0
-    border: none
-    border-radius: 8px
-
-  th
+  tr.col-headers th
     padding: 0px 5px
     padding-top: 3px
     padding-bottom: 3px
@@ -31,9 +24,16 @@
     text-align: left
     background-color: #ccc
 
+  #filter_by_substring
+    background: white url('/images/tiny_magnifying_glass.png') no-repeat 5px 4px
+    padding: 3px 2px 4px 22px
+    margin: 1px 2px 0 0
+    border: none
+    border-radius: 8px
+
   td
     padding: 0px 5px
     padding-right: 25px
 
-  .optional_assignment
+  .optional-assignment
     color: gray

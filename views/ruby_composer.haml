@@ -1,20 +1,27 @@
 #methods-div
-  %p
-    %b Ruby reference
-    %input#filter_by_substring(type='text' placeholder='Filter')
   %table
-    %tr
+    %tr.filters
+      %th
+        Ruby reference
+      %th
+        %select#i-have
+          %option(value='') I have...
+          %option(value='integer') integer(s)
+          %option(value='string') strings(s)
+        %select#i-need
+          %option(value='') I need...
+          %option(value='integer') integer
+          %option(value='string') string
+      %th
+        %input#filter_by_substring(type='text' placeholder='Filter')
+    %tr.col-headers
       %th name
       %th form
       %th example
-      %th output
-      %th input
     - @methods.each_with_index do |method, method_index|
       %tr{:id => "method_#{method_index}"}
         %td.name= method['name']
         %td.form
-          %code!= method['form'].gsub(/\b([is])\b/, '<u>\1</u>').gsub(%r[^(<u>i</u> = )], "<span class='optional-assignment'>\\1</span>")
+          %code!= method['form'].gsub(/\b(intvar|int|strvar|str)\b/, '<u>\1</u>').gsub(%r[^(<u>(intvar|strvar)</u> = )], "<span class='optional-assignment'>\\1</span>")
         %td.example
           %code= method['example']
-        %td.output= method['output']
-        %td.input= method['input']
