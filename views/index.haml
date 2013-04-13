@@ -56,7 +56,8 @@
         - if params['exercise_num']
           %b= "Exercise #{params['exercise_num']}"
         - if @exercise && @exercise['description']
-          = @exercise['description']
+          != @exercise['description'].gsub(/`([^`]*)`/, "<code>\\1</code>")
+
         #user_code_div
           %textarea#user_code_textarea(name='user_code_textarea'
                                        cols='40' rows='10')
@@ -68,7 +69,7 @@
           - if params['exercise_num']
             %b= "Exercise #{params['exercise_num']}"
           - if @exercise && @exercise['description']
-            = @exercise['description']
+            != @exercise['description'].gsub(/`([^`]*)`/, "<code>\\1</code>")
 
           - if @exercise && @exercise['cases'] && @exercise['cases'][i]
             - _case = @exercise['cases'][i]
