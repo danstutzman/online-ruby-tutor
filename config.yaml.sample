@@ -9,6 +9,16 @@ DATABASE_PARAMS:
   production:
     host:     localhost
     adapter:  postgresql
+    username: online_ruby_tutor
+    password: whatever
+    database: online_ruby_tutor
+    encoding: unicode
+  student_checklist_development:
+    adapter: sqlite3
+    database: ../student-checklist/database.sqlite3
+  student_checklist_production:
+    host:     localhost
+    adapter:  postgresql
     username: student_checklist
     password: whatever
     database: student_checklist

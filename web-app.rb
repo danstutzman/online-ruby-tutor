@@ -45,13 +45,15 @@ end
 
 use Airbrake::Sinatra
 
-exercises_path = File.join(File.dirname(__FILE__), 'exercises.yaml')
-EXERCISES = YAML.load_file(exercises_path)
-
 class User < ActiveRecord::Base
 end
 
 class Save < ActiveRecord::Base
+end
+
+class Exercise < ActiveRecord::Base
+  establish_connection(CONFIG['DATABASE_PARAMS'][
+    "student_checklist_#{ENV['RACK_ENV'] || 'development'}"])
 end
 
 def authenticated?
@@ -207,8 +209,9 @@ match '/exercise/:exercise_num' do |exercise_num|
     redirect '/'
   end
 
-  @exercise = EXERCISES[params['exercise_num'].to_i]
-  halt(404, 'Exercise not found') if @exercise.nil?
+  exercise = Exercise.find_by_num(exercise_num.to_i)
+  halt(404, 'Exercise not found') if exercise.nil?
+  @exercise = YAML.load(exercise.yaml)
 
   if request.get?
     old_record =
