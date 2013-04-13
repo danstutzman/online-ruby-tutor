@@ -201,7 +201,7 @@ get '/login' do
   haml :login
 end
 
-match '/exercise/:exercise_num' do
+match '/exercise/:exercise_num' do |exercise_num|
   if params['logout']
     session[:google_plus_user_id] = nil
     redirect '/'
@@ -214,7 +214,7 @@ match '/exercise/:exercise_num' do
     old_record =
       Save.where({
         :user_id      => @current_user.id,
-        :exercise_num => params['exercise_num'],
+        :exercise_num => exercise_num,
         :is_current   => true
       }).first
     if old_record
@@ -223,19 +223,28 @@ match '/exercise/:exercise_num' do
       @user_code = @exercise['starting_code'] || ''
     end
   elsif request.post?
-    @user_code = params['user_code_textarea']
-    Save.transaction do
-      Save.update_all("is_current = 'f'", {
+    if params['action'] == 'save'
+      @user_code = params['user_code_textarea']
+      Save.transaction do
+        Save.update_all("is_current = 'f'", {
+          :user_id      => @current_user.id,
+          :exercise_num => exercise_num,
+          :is_current   => true
+        })
+        Save.create({
+          :user_id      => @current_user.id,
+          :exercise_num => exercise_num,
+          :is_current   => true,
+          :code         => @user_code,
+        })
+      end
+    elsif params['action'] == 'restore'
+      Save.where({
         :user_id      => @current_user.id,
-        :exercise_num => params['exercise_num'],
+        :exercise_num => exercise_num,
         :is_current   => true
-      })
-      Save.create({
-        :user_id      => @current_user.id,
-        :exercise_num => params['exercise_num'],
-        :is_current   => true,
-        :code         => @user_code,
-      })
+      }).update_all(:is_current => false)
+      redirect "/exercise/#{exercise_num}"
     end
   end
 

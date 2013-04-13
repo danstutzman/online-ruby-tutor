@@ -27,7 +27,10 @@
         %a#edit-tab-link(href='#')
           #edit-tab.tab
             %h2 Edit
-            %button(name='save' value='save')
+            - if @exercise && @exercise['starting_code']
+              %button#restore-button(name='action' value='restore')
+                Restore original
+            %button#save-button(name='action' value='save')
               Save and
               %br
               run tests

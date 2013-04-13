@@ -179,3 +179,6 @@ $(document).ready ->
     case_tab.addClass 'selected'
     event.preventDefault()
     false
+
+  $('#restore-button').click (event) ->
+    confirm('Are you sure you want to discard your current code?')
