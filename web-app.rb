@@ -22,7 +22,7 @@ if env == 'production'
   Airbrake.configure { |config| config.api_key = CONFIG['AIRBRAKE_API_KEY'] }
   nil # unicorn will connect to the database
 else
-  set :port, 4567
+  set :port, 4001
   set :static_cache_control, [:public, :no_cache]
   set :sass, { :style => :compact }
   ActiveRecord::Base.establish_connection(CONFIG['DATABASE_PARAMS'][env])
