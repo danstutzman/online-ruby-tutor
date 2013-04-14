@@ -59,3 +59,59 @@
   example: puts first_name
   output: output
   inputs: object
+-
+  name: "greater than"
+  tags: then, compare
+  form: "(if) num > num ..."
+  example: "if n > 0\n  puts \"positive\"\nend"
+  output: bool
+  inputs: num, num
+-
+  name: "greater than or equal to"
+  tags: then, compare
+  form: "(if) num >= num ..."
+  example: "if n >= 0\n  puts \"non-negative\"\nend"
+  output: bool
+  inputs: num, num
+-
+  name: "less than"
+  tags: then, compare
+  form: "(if) num < num ..."
+  example: "if n < 0\n  puts \"negative\"\nend"
+  output: bool
+  inputs: num, num
+-
+  name: "less than or equal to"
+  tags: then, compare
+  form: "(if) num <= num ..."
+  example: "if n <= 0\n  puts \"non-positive\"\nend"
+  output: bool
+  inputs: num, num
+-
+  name: conditional branching (1 leg)
+  tags: then
+  form: "if bool\n  statements\nend"
+  example: "if n > 0\n  puts \"positive\"\nend"
+  output: statements
+  inputs: bool, statements
+-
+  name: conditional branching (2 legs)
+  tags: then otherwise
+  form: "if bool\n  statements\nelse\n  statements\nend"
+  example: "if n > 0\n  puts \"positive\"\nelse\n  puts \"non-positive\"\nend"
+  output: statements
+  inputs: bool, statements
+-
+  name: equality
+  tags: is, equals
+  form: "(if) obj == obj ..."
+  example: "if n == 0\n  puts \"zero\"\nend"
+  output: bool
+  inputs: object, object
+-
+  name: inequality
+  tags: is, equals, not
+  form: "(if) obj != obj ..."
+  example: "if n != 0\n  puts \"non-zero\"\nend"
+  output: bool
+  inputs: object, object
