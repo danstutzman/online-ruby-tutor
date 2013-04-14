@@ -82,7 +82,7 @@
               - if _case['given']
                 %li
                   %b Given:
-                  %code= (_case['given'] || {}).map { |var, val| "#{var} = #{val}" }.join(', ')
+                  %code= (_case['given'] || {}).map { |var, val| "#{var} = #{val.inspect}" }.join(', ')
 
               - if _case['expected_return']
                 %li
