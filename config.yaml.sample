@@ -2,6 +2,9 @@ GOOGLE_KEY: '123456789012.apps.googleusercontent.com'
 GOOGLE_SECRET: 'a1a1a1a1a1a1a1a1a1a1a1a1'
 COOKIE_SIGNING_SECRET: '12345abcdef'
 AIRBRAKE_API_KEY: '0123456789abcdef0123456789abcdef'
+STUDENT_CHECKLIST_HOSTNAME:
+  development: 'localhost:4002'
+  production: 'www.davincicoders.info'
 DATABASE_PARAMS:
   development:
     adapter: sqlite3

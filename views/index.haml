@@ -18,6 +18,8 @@
     %script
       - if @traces
         != "var traces_json = #{JSON.dump(@traces).inspect};"
+      - if @student_checklist_hostname
+        != "var student_checklist_hostname = #{JSON.dump(@student_checklist_hostname).inspect};"
       != create_javascript_var('word_to_method_indexes', @word_to_method_indexes)
       != create_javascript_var('i_have_to_method_indexes', @i_have_to_method_indexes)
       != create_javascript_var('i_need_to_method_indexes', @i_need_to_method_indexes)
@@ -43,10 +45,10 @@
                 = (@exercise && @exercise['cases']) ? "Case #{i}" : 'Debug'
                 - if trace['passed'] == true
                   %br
-                  .passed PASSED
+                  .test-status.passed PASSED
                 - elsif trace['passed'] == false
                   %br
-                  .failed FAILED
+                  .test-status.failed FAILED
         .filler.filler-tall
           logged in as
           = @current_user && @current_user.first_name

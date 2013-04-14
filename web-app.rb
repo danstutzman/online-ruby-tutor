@@ -10,6 +10,7 @@ require 'haml'
 require 'coffee_script'
 require 'active_record'
 require 'airbrake'
+require 'net/http'
 require './get_trace_for.rb'
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
@@ -30,6 +31,8 @@ else
 end
 set :public_folder, 'public'
 set :haml, { :format => :html5, :escape_html => true, :ugly => true }
+
+STUDENT_CHECKLIST_HOSTNAME = CONFIG['STUDENT_CHECKLIST_HOSTNAME'][env]
 
 use Rack::Session::Cookie, {
   :key => 'rack.session',
@@ -132,7 +135,7 @@ get '/' do
   old_record =
     Save.where({
       :user_id      => @current_user.id,
-      :exercise_num => '/',
+      :task_id      => '/',
       :is_current   => true
     }).first
   @user_code = (old_record || Save.new).code || ''
@@ -153,12 +156,12 @@ post '/' do
   Save.transaction do
     Save.update_all("is_current = 'f'", {
       :user_id      => @current_user.id,
-      :exercise_num => '/',
+      :task_id      => '/',
       :is_current   => true
     })
     Save.create({
       :user_id      => @current_user.id,
-      :exercise_num => '/',
+      :task_id      => '/',
       :is_current   => true,
       :code         => @user_code,
     })
@@ -203,22 +206,26 @@ get '/login' do
   haml :login
 end
 
-match '/exercise/:exercise_num' do |exercise_num|
+match '/exercise/:task_id' do |task_id|
   if params['logout']
     session[:google_plus_user_id] = nil
     redirect '/'
   end
 
-  exercise = Exercise.find_by_num(exercise_num.to_i)
+  exercise = Exercise.find_by_task_id(task_id)
   halt(404, 'Exercise not found') if exercise.nil?
-  @exercise = YAML.load(exercise.yaml)
+  begin
+    @exercise = YAML.load(exercise.yaml)
+  rescue Psych::SyntaxError => e
+    halt 500, "#{e.class}: #{e} with #{exercise.yaml}"
+  end
 
   if request.get?
     old_record =
       Save.where({
-        :user_id      => @current_user.id,
-        :exercise_num => exercise_num,
-        :is_current   => true
+        :user_id     => @current_user.id,
+        :task_id     => task_id,
+        :is_current  => true
       }).first
     if old_record
       @user_code = old_record.code
@@ -231,12 +238,12 @@ match '/exercise/:exercise_num' do |exercise_num|
       Save.transaction do
         Save.update_all("is_current = 'f'", {
           :user_id      => @current_user.id,
-          :exercise_num => exercise_num,
+          :task_id      => task_id,
           :is_current   => true
         })
         Save.create({
           :user_id      => @current_user.id,
-          :exercise_num => exercise_num,
+          :task_id      => task_id,
           :is_current   => true,
           :code         => @user_code,
         })
@@ -244,30 +251,49 @@ match '/exercise/:exercise_num' do |exercise_num|
     elsif params['action'] == 'restore'
       Save.where({
         :user_id      => @current_user.id,
-        :exercise_num => exercise_num,
+        :task_id      => task_id,
         :is_current   => true
       }).update_all(:is_current => false)
-      redirect "/exercise/#{exercise_num}"
+      redirect "/exercise/#{task_id}"
     end
   end
 
   cases_given =
     (@exercise['cases'] || [{}]).map { |_case| _case['given'] || {} }
   @traces = get_trace_for_cases(@user_code, cases_given)
+
+  num_passed = 0
+  num_failed = 0
   @traces.each_with_index do |trace, i|
+    passed = nil
     if @exercise['cases'].nil? || @exercise['cases'][i].nil?
-      nil # cases don't apply to this exercise
+      # cases don't apply to this exercise
     elsif expected_return = @exercise['cases'][i]['expected_return']
-      trace['passed'] = (trace['returned'] == expected_return)
+      passed = (trace['returned'] == expected_return)
     elsif expected_stdout = @exercise['cases'][i]['expected_stdout']
-      trace['passed'] =
-        ((trace['trace'].last['stdout'] || '').chomp == expected_stdout)
+      passed = ((trace['trace'].last['stdout'] || '').chomp == expected_stdout)
     end
+
+    trace['passed'] = passed
+    num_passed += 1 if passed == true
+    num_failed += 1 if passed == false
   end
+
+  if (task_id[0] == 'C' && num_passed > 0 && num_failed == 0) ||
+     (task_id[0] == 'D')
+    uri = URI.parse("http://#{STUDENT_CHECKLIST_HOSTNAME}/mark_task_complete")
+    data = {
+      'google_plus_user_id' => @current_user.google_plus_user_id,
+      'task_id'             => task_id,
+    }
+    Net::HTTP.post_form(uri, data)
+  end
+
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
   @i_need_to_method_indexes = load_i_need_to_method_indexes(@methods)
+
   haml :index
 end
 
