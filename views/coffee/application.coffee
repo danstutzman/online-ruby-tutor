@@ -136,11 +136,10 @@ $(document).ready ->
       setupVisualizer i
       i++
 
-    $('#jmpStepFwd').click (event) ->
-      changePythonToRuby()
-
-    $('#jmpStepBack').click (event) ->
-      changePythonToRuby()
+    $('#jmpFirstInstr').click (event) -> changePythonToRuby()
+    $('#jmpStepBack').click (event)   -> changePythonToRuby()
+    $('#jmpStepFwd').click (event)    -> changePythonToRuby()
+    $('#jmpLastInstr').click (event)  -> changePythonToRuby()
 
   for word of word_to_method_indexes
     for i of word_to_method_indexes[word]
