@@ -78,7 +78,7 @@ class Save < ActiveRecord::Base
 end
 
 class Exercise < ActiveRecord::Base
-  if CONFIG['STUDENT_CHECKLIST_DATABASE_URL'] # Heroku
+  if ENV['STUDENT_CHECKLIST_DATABASE_URL'] # Heroku
     db = URI.parse(ENV['STUDENT_CHECKLIST_DATABASE_URL'])
     ActiveRecord::Base.establish_connection({
       :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
