@@ -136,10 +136,12 @@ $(document).ready ->
       setupVisualizer i
       i++
 
-    $('#jmpFirstInstr').click (event) -> changePythonToRuby()
-    $('#jmpStepBack').click (event)   -> changePythonToRuby()
-    $('#jmpStepFwd').click (event)    -> changePythonToRuby()
-    $('#jmpLastInstr').click (event)  -> changePythonToRuby()
+    # Use id selectors instead of # because there are multiple buttons
+    # with the same id unfortunately.
+    $("button[id=jmpFirstInstr]").click (event) -> changePythonToRuby()
+    $("button[id=jmpStepBack]").click (event)   -> changePythonToRuby()
+    $("button[id=jmpStepFwd]").click (event)    -> changePythonToRuby()
+    $("button[id=jmpLastInstr]").click (event)  -> changePythonToRuby()
 
   for word of word_to_method_indexes
     for i of word_to_method_indexes[word]
