@@ -345,6 +345,43 @@ get '/js/application.js' do
   coffee 'coffee/application'.intern
 end
 
+get '/users' do
+  if !@current_user.is_admin
+    redirect '/auth/failure?message=You+must+be+an+admin+to+edit+users'
+  end
+  @users = User.order('id')
+  haml :users
+end
+
+post '/users' do
+  if !@current_user.is_admin
+    redirect '/auth/failure?message=You+must+be+an+admin+to+edit+users'
+  end
+
+  fields = %w[id first_name last_name google_plus_user_id is_admin email]
+
+  User.transaction do
+    User.order('id').each do |user|
+      fields.each do |field|
+        user[field] = params["#{field}_#{user.id}"]
+      end
+      user['google_plus_user_id'] = nil if user['google_plus_user_id'] == ''
+      user.save!
+    end
+
+    if (params["first_name_"] || '') != ''
+      user = User.new
+      fields.each do |field|
+        user[field] = params["#{field}_"]
+      end
+      user['google_plus_user_id'] = nil if user['google_plus_user_id'] == ''
+      user.save!
+    end
+  end
+
+  redirect '/users'
+end
+
 after do
   ActiveRecord::Base.clear_active_connections!
 end

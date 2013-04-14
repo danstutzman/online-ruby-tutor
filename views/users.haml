@@ -1,0 +1,40 @@
+%h1 Users
+%form(method='post' action='/users')
+  %table(border='1')
+    %tr
+      %th id
+      %th first_name
+      %th last_name
+      %th google_plus_user_id
+      %th is_admin
+      %th email
+    - (@users + [User.new]).each do |user|
+      %tr
+        %td
+          - if user.id
+            %input{:type => 'text', :name => "id_#{user.id}", :size => 2,
+              :value => user.id }
+          - else
+            new
+        %td
+          %input{:type => 'text', :name => "first_name_#{user.id}",
+            :size => 15,
+            :value => user.first_name }
+        %td
+          %input{:type => 'text', :name => "last_name_#{user.id}",
+            :size => 15,
+            :value => user.last_name }
+        %td
+          %input{:type => 'text', :name => "google_plus_user_id_#{user.id}",
+            :size => 30,
+            :value => user.google_plus_user_id }
+        %td
+          %input{:type => 'text', :name => "is_admin_#{user.id}", :size => 1,
+            :value => user.is_admin ? 't' : 'f' }
+        %td
+          %input{:type => 'text', :name => "email_#{user.id}",
+            :size => 30,
+            :value => user.email }
+  %p
+    %button Update
+  
