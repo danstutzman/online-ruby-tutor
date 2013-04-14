@@ -80,7 +80,7 @@ end
 class Exercise < ActiveRecord::Base
   if ENV['STUDENT_CHECKLIST_DATABASE_URL'] # Heroku
     db = URI.parse(ENV['STUDENT_CHECKLIST_DATABASE_URL'])
-    ActiveRecord::Base.establish_connection({
+    establish_connection({
       :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
       :host     => db.host,
       :port     => db.port,
