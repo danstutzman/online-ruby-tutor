@@ -40,24 +40,11 @@
   inputs: number, number
 -
   name: convert object to string
-  form: strvar = obj.to_s
-  example: age_string = age.to_s
-  output: string
-  inputs: object
--
-  name: convert object to string
   tags: interpolation, hash, curly, braces
   form: "strvar = \"#{obj}\""
   example: "age_string = \"#{age}\""
   output: string
   inputs: object
--
-  name: convert number to string (2 decimal places)
-  tags: percent, sprintf, printf, format
-  form: "strvar = \"%.2f\" % num"
-  example: "total_str = \"%.2f\" % total"
-  output: string
-  inputs: number
 -
   name: add to number variable
   tags: increment, plus
@@ -72,73 +59,3 @@
   example: puts first_name
   output: output
   inputs: object
--
-  name: output object
-  tags: print
-  form: print obj
-  example: 'print "#{first_name}\n"'
-  output: output
-  inputs: object
--
-  name: "output object.inspect and newline"
-  tags: print inspect
-  form: p obj
-  example: 'p first_name'
-  output: output
-  inputs: object
--
-  name: conditional branching (1 leg)
-  tags: then
-  form: "if bool\n  statements\nend"
-  example: "if n > 0\n  puts \"positive\"\nend"
-  output: statements
-  inputs: bool, statements
--
-  name: conditional branching (2 legs)
-  tags: then otherwise
-  form: "if bool\n  statements\nelse\n  statements\nend"
-  example: "if n > 0\n  puts \"positive\"\nelse\n  puts \"non-positive\"\nend"
-  output: statements
-  inputs: bool, statements
--
-  name: conditional branching (3+ legs)
-  tags: then otherwise
-  form: "if bool\n  statements\nelsif bool\n  statements\nelse\n  statements\nend"
-  example: "if n > 0\n  puts \"positive\"\nelsif n < 0\n  puts \"negative\"\nelse\n  puts \"zero\"\nend"
-  output: statements
-  inputs: bool, statements
--
-  name: equality
-  tags: is, equals
-  form: "(if) obj == obj ..."
-  example: "if n == 0\n  puts \"zero\"\nend"
-  output: bool
-  inputs: object, object
--
-  name: inequality
-  tags: is, equals, not
-  form: "(if) obj != obj ..."
-  example: "if n != 0\n  puts \"non-zero\"\nend"
-  output: bool
-  inputs: object, object
--
-  name: boolean short-circuit AND
-  tags: intersection, both, and
-  form: "(if) bool && bool ..."
-  example: "if speed > 0 && is_red_light\n  puts \"stop\"\nend"
-  output: bool
-  inputs: bool, bool
--
-  name: boolean short-circuit OR
-  tags: union, either, or
-  form: "(if) bool || bool ..."
-  example: "if is_raining || is_snowing\n  puts \"canceled\"\nend"
-  output: bool
-  inputs: bool, bool
--
-  name: boolean NOT
-  tags: negate, negation, not
-  form: "(if) !bool ..."
-  example: "if !too_cold\n  puts \"play outside\"\nend"
-  output: bool
-  inputs: bool
