@@ -78,8 +78,21 @@ class Save < ActiveRecord::Base
 end
 
 class Exercise < ActiveRecord::Base
-  establish_connection(CONFIG['DATABASE_PARAMS'][
-    "student_checklist_#{ENV['RACK_ENV'] || 'development'}"])
+  if CONFIG['STUDENT_CHECKLIST_DATABASE_URL'] # Heroku
+    db = URI.parse(ENV['STUDENT_CHECKLIST_DATABASE_URL'])
+    ActiveRecord::Base.establish_connection({
+      :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
+      :host     => db.host,
+      :port     => db.port,
+      :username => db.user,
+      :password => db.password,
+      :database => db.path[1..-1],
+      :encoding => 'utf8',
+    })
+  else
+    establish_connection(CONFIG['DATABASE_PARAMS'][
+      "student_checklist_#{ENV['RACK_ENV'] || 'development'}"])
+  end
 end
 
 def authenticated?
