@@ -322,7 +322,11 @@ match '/exercise/:task_id' do |task_id|
       'google_plus_user_id' => @current_user.google_plus_user_id,
       'task_id'             => task_id,
     }
-    Net::HTTP.post_form(uri, data)
+    begin
+      Net::HTTP.post_form(uri, data)
+    rescue Errno::ECONNREFUSED => e
+      # Heroku apparently doesn't allow this
+    end
   end
 
   @methods = load_methods
