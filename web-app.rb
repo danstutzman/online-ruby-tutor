@@ -14,21 +14,44 @@ require 'net/http'
 require './get_trace_for.rb'
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
-CONFIG = YAML.load_file(config_path)
+if File.exists?(config_path)
+  CONFIG = YAML.load_file(config_path)
+  env = ENV['RACK_ENV'] || 'development'
+  if env == 'production'
+    set :static_cache_control, [:public, :max_age => 300]
+    set :sass, { :style => :compressed }
+    Airbrake.configure { |config| config.api_key = CONFIG['AIRBRAKE_API_KEY'] }
+    nil # unicorn will connect to the database
+  else
+    set :port, 4001
+    set :static_cache_control, [:public, :no_cache]
+    set :sass, { :style => :compact }
+    ActiveRecord::Base.establish_connection(CONFIG['DATABASE_PARAMS'][env])
+    ActiveRecord::Base.logger = Logger.new(STDOUT)
+  end
+else # for Heroku, which doesn't support creating config.yaml
+  CONFIG = {}
+  missing = []
+  %w[GOOGLE_KEY GOOGLE_SECRET COOKIE_SIGNING_SECRET AIRBRAKE_API_KEY].each do
+    |key| CONFIG[key] = ENV[key] or missing.push key
+  end
+  CONFIG['STUDENT_CHECKLIST_HOSTNAME'] = { 'production' => ENV['STUDENT_CHECKLIST_HOSTNAME'] } or missing.push 'STUDENT_CHECKLIST_HOSTNAME'
+  if missing.size > 0
+    raise "Missing config.yaml and ENV keys #{missing.join(', ')}"
+  end
 
-env = ENV['RACK_ENV'] || 'development'
-if env == 'production'
-  set :static_cache_control, [:public, :max_age => 300]
-  set :sass, { :style => :compressed }
-  Airbrake.configure { |config| config.api_key = CONFIG['AIRBRAKE_API_KEY'] }
-  nil # unicorn will connect to the database
-else
-  set :port, 4001
-  set :static_cache_control, [:public, :no_cache]
-  set :sass, { :style => :compact }
-  ActiveRecord::Base.establish_connection(CONFIG['DATABASE_PARAMS'][env])
-  ActiveRecord::Base.logger = Logger.new(STDOUT)
+  db = URI.parse(ENV['DATABASE_URL'])
+  ActiveRecord::Base.establish_connection({
+    :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
+    :host     => db.host,
+    :port     => db.port,
+    :username => db.user,
+    :password => db.password,
+    :database => db.path[1..-1],
+    :encoding => 'utf8',
+  })
 end
+
 set :public_folder, 'public'
 set :haml, { :format => :html5, :escape_html => true, :ugly => true }
 
