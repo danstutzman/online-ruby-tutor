@@ -218,6 +218,12 @@ def get_trace_for_case(___user_code, ___assignments)
     exception_frame['line'] = line_num
     exception_frame['event'] = 'uncaught_exception'
     exception_frame['offset'] = 1
+    if exception_frame['ordered_globals'].nil?
+      exception_frame['ordered_globals'] = []
+    end
+    if exception_frame['stack_to_render'].nil?
+      exception_frame['stack_to_render'] = {}
+    end
     returned = e
   end
   {
