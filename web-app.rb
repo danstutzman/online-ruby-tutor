@@ -385,3 +385,7 @@ end
 after do
   ActiveRecord::Base.clear_active_connections!
 end
+
+# Remove ActiveSupport's monkey-patching of const_missing, because
+# otherwise missing-constant errors turn into too-many-instruction errors.
+ActiveSupport::Dependencies::ModuleConstMissing.exclude_from(Module)
