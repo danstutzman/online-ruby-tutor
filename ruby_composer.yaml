@@ -102,6 +102,13 @@
   output: statements
   inputs: bool, statements
 -
+  name: conditional branching (3+ legs)
+  tags: then otherwise
+  form: "if bool\n  statements\nelsif bool\n  statements\nelse\n  statements\nend"
+  example: "if n > 0\n  puts \"positive\"\nelsif n < 0\n  puts \"negative\"\nelse\n  puts \"zero\"\nend"
+  output: statements
+  inputs: bool, statements
+-
   name: equality
   tags: is, equals
   form: "(if) obj == obj ..."
@@ -115,3 +122,17 @@
   example: "if n != 0\n  puts \"non-zero\"\nend"
   output: bool
   inputs: object, object
+-
+  name: boolean short-circuit AND
+  tags: intersection, both, and
+  form: "(if) bool && bool ..."
+  example: "if speed > 0 && is_red_light\n  puts \"stop\"\nend"
+  output: bool
+  inputs: bool, bool
+-
+  name: boolean short-circuit OR
+  tags: union, either, or
+  form: "(if) bool || bool ..."
+  example: "if is_raining || is_snowing\n  puts \"canceled\"\nend"
+  output: bool
+  inputs: bool, bool
