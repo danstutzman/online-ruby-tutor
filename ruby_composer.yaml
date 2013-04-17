@@ -11,6 +11,12 @@
   output: number
   inputs: number
 -
+  name: string literal
+  form: strvar = str
+  example: "name = \"Bob\""
+  output: string
+  inputs: string
+-
   name: addition
   tags: plus
   form: numvar = num + num
