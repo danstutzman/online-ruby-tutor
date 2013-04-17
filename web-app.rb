@@ -96,8 +96,12 @@ class Exercise < ActiveRecord::Base
 end
 
 def authenticated?
-  @current_user =
-    User.find_by_google_plus_user_id(session[:google_plus_user_id])
+  if session[:google_plus_user_id]
+    @current_user =
+      User.find_by_google_plus_user_id(session[:google_plus_user_id])
+  else
+    @current_user = nil
+  end
 end
 
 def match(path, opts={}, &block)
