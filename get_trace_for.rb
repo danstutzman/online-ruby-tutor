@@ -185,13 +185,13 @@ def get_trace_for_case(___user_code, ___assignments)
     end
   rescue Timeout::Error => e
     set_trace_func nil
-    $__traces.push({
+    $___traces.push({
       'exception_msg' => "(timeout)",
       'event' => 'instruction_limit_reached',
     })
     returned = e
   rescue InstructionLimitReached => e
-    $__traces.push({
+    $___traces.push({
       'exception_msg' => "(stopped after #{$___MAX_INSTRUCTIONS_LIMIT} steps to prevent possible infinite loop)",
       'event' => 'instruction_limit_reached',
     })
