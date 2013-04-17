@@ -161,9 +161,6 @@ def ___get_trace_for_internal(___user_code, ___assignments)
 
   begin
     set_trace_func $___trace_func
-    puts 'here'
-    i = 0
-    #puts ($___PREFIX + ___assignment_line + ___user_code + $___SUFFIX).split("\n").map { |line| i += 1; sprintf("%02d ", i) + line }.join("\n")
     eval($___PREFIX + ___assignment_line + ___user_code + $___SUFFIX)
   ensure
     set_trace_func nil
