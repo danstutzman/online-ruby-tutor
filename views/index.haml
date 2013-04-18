@@ -100,11 +100,7 @@
               - if trace['trace'].last['exception_msg']
                 %li
                   %b Uncaught exception:
-                  %code.exception
-                    = trace['trace'].last['exception_msg']
-                  - if trace['trace'].last['line']
-                    %code.exception
-                      = "at line #{trace['trace'].last['line']}"
+                  %code.exception= trace['trace'].last['exception_msg']
 
               %li
                 %b Result:

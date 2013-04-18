@@ -215,13 +215,15 @@ def get_trace_for_case(___user_code, ___assignments)
     elsif e.backtrace && e.backtrace[0] &&
       match = e.backtrace[0].match(/\(eval\):([0-9]+):in `<module:UserCode>'/)
       line_num = match[1].to_i - $___NUM_PREFIX_LINES
+      exception_msg += " at line #{line_num}"
     elsif e.backtrace && e.backtrace[1] &&
       match = e.backtrace[1].match(/\(eval\):([0-9]+):in `<module:UserCode>'/)
       line_num = match[1].to_i - $___NUM_PREFIX_LINES
+      exception_msg += " at line #{line_num}"
     end
 
     exception_msg.gsub!(
-      /^uninitialized constant UserCode::([^ ]+) \(NameError\)$/,
+      /^uninitialized constant UserCode::([^ ]+) \(NameError\)/,
       'uninitialized constant \\1 (NameError)')
 
     $___traces.push({}) if $___traces.size == 0
