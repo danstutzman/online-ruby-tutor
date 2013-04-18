@@ -41,12 +41,9 @@
             .tab.case-tab{ :"data-case-num" => i }
               %h2
                 = (@exercise && @exercise['cases']) ? "Case #{i}" : 'Debug'
-                - if trace['passed'] == true
-                  %br
-                  .test-status.passed PASSED
-                - elsif trace['passed'] == false
-                  %br
-                  .test-status.failed FAILED
+                - if trace['test_status'] != nil
+                  .test-status{ :class => trace['test_status'].downcase }
+                    = trace['test_status']
         .filler.filler-tall
           logged in as
           = @current_user && @current_user.first_name
@@ -100,11 +97,19 @@
                   %pre(style='display:inline-block;vertical-align:top')
                     = trace['trace'].last['stdout']
 
+              - if trace['trace'].last['exception_msg']
+                %li
+                  %b Uncaught exception:
+                  %code.exception
+                    = trace['trace'].last['exception_msg']
+                  - if trace['trace'].last['line']
+                    %code.exception
+                      = "at line #{trace['trace'].last['line']}"
+
               %li
                 %b Result:
-                - if trace['passed'] == true
-                  .passed PASSED
-                - elsif trace['passed'] == false
-                  .failed FAILED
+                - if trace['test_status'] != nil
+                  .test-status{ :class => trace['test_status'].downcase }
+                    = trace['test_status']
 
           %div{ :id => "trace_render_div#{i}" }

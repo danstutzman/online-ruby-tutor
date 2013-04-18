@@ -305,18 +305,21 @@ match '/exercise/:task_id' do |task_id|
   num_passed = 0
   num_failed = 0
   @traces.each_with_index do |trace, i|
-    passed = nil
-    if @exercise['cases'].nil? || @exercise['cases'][i].nil?
+    if trace['trace'].last['exception_msg']
+      trace['test_status'] = 'ERROR'
+    elsif @exercise['cases'].nil? || @exercise['cases'][i].nil?
       # cases don't apply to this exercise
     elsif expected_return = @exercise['cases'][i]['expected_return']
-      passed = (trace['returned'] == expected_return)
+      trace['test_status'] =
+        (trace['returned'] == expected_return) ? 'PASSED' : 'FAILED'
     elsif expected_stdout = @exercise['cases'][i]['expected_stdout']
-      passed = ((trace['trace'].last['stdout'] || '').chomp == expected_stdout)
+      trace['test_status'] =
+        ((trace['trace'].last['stdout'] || '').chomp == expected_stdout) ?
+        'PASSED' : 'FAILED'
     end
-
-    trace['passed'] = passed
-    num_passed += 1 if passed == true
-    num_failed += 1 if passed == false
+    num_passed += 1 if trace['test_status'] == 'PASSED'
+    num_failed += 1 if trace['test_status'] == 'FAILED' ||
+                       trace['test_status'] == 'ERROR'
   end
 
   if (task_id[0] == 'C' && num_passed > 0 && num_failed == 0) ||

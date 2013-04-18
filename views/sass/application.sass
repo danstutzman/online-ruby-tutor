@@ -10,12 +10,16 @@ body
   font-family: sans-serif
   margin: 0
 
-.failed
-  color: red
+.test-status
   display: inline-block
   width: 60px
 
-.passed
-  color: green
-  display: inline-block
-  width: 60px
+  &.failed
+    color: red
+  &.error
+    color: red
+  &.passed
+    color: green
+
+.exception
+  color: red
