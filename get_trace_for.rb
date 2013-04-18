@@ -25,9 +25,13 @@ end
 UserCode.untrust
 $SAFE = 4
 module UserCode
+begin
 "
 $___NUM_PREFIX_LINES = $___PREFIX.split("\n").size + 1 # + 1 for assignments
 $___SUFFIX = "
+rescue => ___e
+  ___e
+end
 end
 "
 $___NUM_SUFFIX_LINES = $___SUFFIX.split("\n").size
@@ -180,6 +184,9 @@ def get_trace_for_case(___user_code, ___assignments)
         ___get_trace_for_internal(___user_code_changed, ___assignments)
       }.value
     end
+    if Exception === returned
+      raise returned
+    end
   rescue Timeout::Error => e
     set_trace_func nil
     $___traces.push({
@@ -205,6 +212,9 @@ def get_trace_for_case(___user_code, ___assignments)
       # fudge the line number
       exception_msg = e.to_s.gsub(":#{match[1]}:", ":#{line_num}:")
       exception_msg = "#{exception_msg} (#{e.class})"
+    elsif e.backtrace && e.backtrace[0] &&
+      match = e.backtrace[0].match(/\(eval\):([0-9]+):in `<module:UserCode>'/)
+      line_num = match[1].to_i - $___NUM_PREFIX_LINES
     elsif e.backtrace && e.backtrace[1] &&
       match = e.backtrace[1].match(/\(eval\):([0-9]+):in `<module:UserCode>'/)
       line_num = match[1].to_i - $___NUM_PREFIX_LINES
