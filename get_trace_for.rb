@@ -128,7 +128,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     end
   
     num_lines_over = (line - $___NUM_PREFIX_LINES) - $___user_code_num_lines
-    if line > $___NUM_PREFIX_LINES && num_lines_over <= 2
+    if line > $___NUM_PREFIX_LINES && num_lines_over < $___NUM_SUFFIX_LINES + 1
       trace = {
         'ordered_globals' => [],
         'stdout' => stdout.string.clone,
