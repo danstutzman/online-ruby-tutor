@@ -142,3 +142,10 @@
   example: "if is_raining || is_snowing\n  puts \"canceled\"\nend"
   output: bool
   inputs: bool, bool
+-
+  name: while loop
+  tags: until
+  form: "while bool\n  statements\nend"
+  example: "while i <= 10\n  i += 1\nend"
+  output: statements
+  inputs: bool, statements
