@@ -155,3 +155,15 @@
   example: "first_name = readline.chomp"
   output: string
   inputs: keyboard
+-
+  name: remove trailing newline if any
+  form: "strvar = str.chomp"
+  example: "first_name = readline.chomp"
+  output: string
+  inputs: string
+-
+  name: convert to number (integer)
+  form: "intvar = str.to_i"
+  example: "age = age_string.to_i"
+  output: number
+  inputs: string
