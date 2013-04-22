@@ -149,3 +149,9 @@
   example: "while i <= 10\n  i += 1\nend"
   output: statements
   inputs: bool, statements
+-
+  name: read keyboard input
+  form: "strvar = readline"
+  example: "first_name = readline.chomp"
+  output: string
+  inputs: keyboard
