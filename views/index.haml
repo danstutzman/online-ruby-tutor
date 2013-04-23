@@ -91,11 +91,11 @@
                 %li
                   %b Expected output:
                   %pre(style='display:inline-block;vertical-align:top')
-                    = _case['expected_stdout']
+                    != _case['expected_stdout'].gsub('<', '&lt;')
                 %li
                   %b Actual output:
                   %pre(style='display:inline-block;vertical-align:top')
-                    = trace['trace'].last && trace['trace'].last['stdout']
+                    != trace['trace'].last && (trace['trace'].last['stdout'] || '').gsub('<', '&lt;')
 
               - if trace['trace'].last && trace['trace'].last['exception_msg']
                 %li
