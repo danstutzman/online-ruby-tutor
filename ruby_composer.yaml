@@ -163,7 +163,75 @@
   inputs: string
 -
   name: convert to number (integer)
-  form: "intvar = str.to_i"
+  form: "numvar = str.to_i"
   example: "age = age_string.to_i"
   output: number
   inputs: string
+-
+  name: array literal
+  form: arrvar = arr
+  example: 'names = ["Jill", "Bob", "Susan"]'
+  output: array
+  inputs: array
+-
+  name: "output object's Ruby source and newline"
+  tags: print inspect
+  form: p obj
+  example: 'p first_name'
+  output: output
+  inputs: object
+-
+  name: "for loop through range"
+  tags: ".."
+  form: "for numvar in num..num\n  statements\nend"
+  example: "for i in 1..5\n  puts i\nend"
+  output: number, statements
+  inputs: number, statements
+-
+  name: "for loop through array"
+  form: "for objvar in arr\n  statements\nend"
+  example: "for name in names\n  puts name\nend"
+  output: object, statements
+  inputs: array, statements
+-
+  name: "get element from array"
+  form: "objvar = arrvar[numvar]"
+  example: "puts rows[0]"
+  output: object
+  inputs: array, number
+-
+  name: "round a number to an integer"
+  form: "numvar = num.round"
+  example: "price_rounded = price.round"
+  output: number
+  inputs: number
+-
+  name: (global) string substitution
+  form: strvar = str.gsub(str, str)
+  example: "puts \"LEET\".gsub(\"E\", \"3\")"
+  output: string
+  inputs: string, string
+-
+  name: append to array
+  form: arr.push(obj)
+  example: "names.push(\"Bob\")"
+  output: array
+  inputs: array, object
+-
+  name: array length
+  form: numvar = arr.size
+  example: "num_names = names.size"
+  output: number
+  inputs: array
+-
+  name: reverse array
+  form: arrvar = arr.reverse
+  example: "names_reversed = names.reverse"
+  output: array
+  inputs: array
+-
+  name: sort array
+  form: arrvar = arr.sort
+  example: "names_sorted = names.sort"
+  output: array
+  inputs: array
