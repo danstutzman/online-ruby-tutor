@@ -315,7 +315,7 @@ match '/exercise/:task_id' do |task_id|
         (trace['returned'] == expected_return) ? 'PASSED' : 'FAILED'
     elsif expected_stdout = @exercise['cases'][i]['expected_stdout']
       trace['test_status'] =
-        ((last['stdout'] || '').chomp == expected_stdout) ?
+        ((last['stdout'] || '').chomp == expected_stdout.chomp) ?
         'PASSED' : 'FAILED'
     end
     num_passed += 1 if trace['test_status'] == 'PASSED'
