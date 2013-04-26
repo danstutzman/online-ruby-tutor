@@ -69,7 +69,7 @@ filterMethodsByIHave = (old_method_indexes_to_show) ->
     for method_index in (i_have_to_method_indexes["#{input}s"] || [])
       if old_method_indexes_to_show[method_index]
         new_method_indexes_to_show[method_index] = true
-    if input isnt 'statements'
+    if input isnt 'statements' && input isnt 'file'
       for method_index in (i_have_to_method_indexes['object'] || [])
         if old_method_indexes_to_show[method_index]
           new_method_indexes_to_show[method_index] = true

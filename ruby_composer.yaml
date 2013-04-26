@@ -235,3 +235,45 @@
   example: "names_sorted = names.sort"
   output: array
   inputs: array
+-
+  name: split string into array
+  form: arrvar = str.split(str)
+  example: "words = sentence.split(\" \")"
+  output: array
+  inputs: string, string
+-
+  name: join array elements into string
+  form: strvar = arr.join(str)
+  example: "sentence = words.join(\" \")"
+  output: string
+  inputs: array, string
+-
+  name: open file for reading or writing
+  form: filevar = File.open(str, str)
+  example: "file = File.open(\"input.txt\", \"r\")"
+  output: file
+  inputs: string, string
+-
+  name: close file, flushing any writes
+  form: file.close
+  example: "html_output.close"
+  output: ""
+  inputs: file
+-
+  name: read each line of file
+  form: arrvar = file.each_line
+  example: "for line in file.each_line\n  puts line\nend"
+  output: array
+  inputs: file
+-
+  name: write to open file
+  form: file.puts obj
+  example: "file.puts \"test\""
+  output: output
+  inputs: file, object
+-
+  name: pause program for debugging
+  form: binding.pry
+  example: binding.pry
+  output: ""
+  inputs: ""

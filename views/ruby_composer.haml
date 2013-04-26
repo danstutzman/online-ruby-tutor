@@ -8,6 +8,7 @@
           %option(value='') I have...
           %option(value='array') array
           %option(value='bool') bool
+          %option(value='file') file
           %option(value='number') number(s)
           %option(value='statements') statement(s)
           %option(value='string') strings(s)
@@ -15,6 +16,7 @@
           %option(value='') I need...
           %option(value='array') array
           %option(value='bool') bool
+          %option(value='file') file
           %option(value='number') number
           %option(value='output') output
           %option(value='statements') run statements
@@ -29,6 +31,6 @@
       %tr{:id => "method_#{method_index}"}
         %td.name= method['name']
         %td.form
-          %code!= method['form'].gsub(%r[(^(num|str|obj|arr)var =|^\(if\) |\.\.\.)], "<span class='optional-assignment'>\\1</span>").gsub(%r[>\(if\) <], ">if <").gsub(/\b(numvar|num|strvar|str|statements|bool|objvar|obj|arrvar|arr)\b/, '<u>\1</u>').gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }
+          %code!= method['form'].gsub(%r[(^(num|str|obj|arr)var =|^\(if\) |\.\.\.)], "<span class='optional-assignment'>\\1</span>").gsub(%r[>\(if\) <], ">if <").gsub(/\b(numvar|num|strvar|str|statements|bool|objvar|obj|arrvar|arr|filevar|file)\b/, '<u>\1</u>').gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }
         %td.example
           %code!= method['example'].gsub(/\n( *)/) { "<br>\n" + ('&nbsp;' * $1.length) }
