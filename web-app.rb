@@ -391,9 +391,6 @@ post '/users' do
 end
 
 match '/saves/:task_id' do |task_id|
-  if !@current_user.is_admin
-    redirect '/auth/failure?message=You+must+be+an+admin+to+see+saves'
-  end
   @task_id = task_id
   @saves = Save.where(:is_current => true, :task_id => task_id).order(:id)
   haml :saves
