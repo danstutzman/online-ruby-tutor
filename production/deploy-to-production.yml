@@ -1,0 +1,11 @@
+- hosts: web
+  user: deployer
+  tasks:
+  - command: "git pull chdir=/home/deployer/online-ruby-tutor"
+  - command: "bundle install --deployment chdir=/home/deployer/online-ruby-tutor"
+  - copy: src=../config.yaml dest=/home/deployer/online-ruby-tutor/config.yaml
+  - command: "sh -c 'RACK_ENV=production bundle exec ruby run_migrations.rb' chdir=/home/deployer/online-ruby-tutor"
+  - command: "git submodule init chdir=/home/deployer/online-ruby-tutor"
+  - command: "git submodule update chdir=/home/deployer/online-ruby-tutor"
+  - command: sh -c "if [ -e tmp/pids/thin.pid ]; then cat tmp/pids/thin.pid | xargs kill; rm tmp/pids/thin.pid; fi" chdir=/home/deployer/online-ruby-tutor
+  - command: "bundle exec thin start -p 3004 -e production -d chdir=/home/deployer/online-ruby-tutor"
