@@ -45,8 +45,8 @@
   - command: "mkdir -p tmp tmp/sockets tmp/pids log chdir=/home/deployer/online-ruby-tutor"
   - command: "git submodule init chdir=/home/deployer/online-ruby-tutor"
   - command: "git submodule update chdir=/home/deployer/online-ruby-tutor"
-  - command: sh -c "if [ -e tmp/pids/unicorn.pid ]; then cat tmp/pids/unicorn.pid | xargs kill; rm tmp/pids/unicorn.pid; fi" chdir=/home/deployer/online-ruby-tutor
-  - command: "bundle exec unicorn -c unicorn.rb -E production -D -l 0.0.0.0:3001 chdir=/home/deployer/online-ruby-tutor"
+  - command: sh -c "if [ -e tmp/pids/thin.pid ]; then cat tmp/pids/thin.pid | xargs kill; rm tmp/pids/thin.pid; fi" chdir=/home/deployer/online-ruby-tutor
+  - command: "bundle exec thin start -p 3004 -e production -d chdir=/home/deployer/online-ruby-tutor"
 
 - hosts: web
   user: root

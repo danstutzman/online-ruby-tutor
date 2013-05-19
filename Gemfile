@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 gem 'sinatra'
-gem 'unicorn', :group => 'production'
 gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'tilt'
