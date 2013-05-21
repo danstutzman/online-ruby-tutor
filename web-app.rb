@@ -21,14 +21,13 @@ if File.exists?(config_path)
     set :static_cache_control, [:public, :max_age => 300]
     set :sass, { :style => :compressed }
     Airbrake.configure { |config| config.api_key = CONFIG['AIRBRAKE_API_KEY'] }
-    nil # unicorn will connect to the database
   else
     set :port, 4001
     set :static_cache_control, [:public, :no_cache]
     set :sass, { :style => :compact }
-    ActiveRecord::Base.establish_connection(CONFIG['DATABASE_PARAMS'][env])
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
   end
+  ActiveRecord::Base.establish_connection(CONFIG['DATABASE_PARAMS'][env])
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
 else # for Heroku, which doesn't support creating config.yaml
   CONFIG = {}
   missing = []
