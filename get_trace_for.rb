@@ -310,6 +310,7 @@ def fake_active_record_class_definition(class_name, column_name_to_type,
     @attributes[:#{name}] = case new_value
       when nil then nil
       when '' then nil
+      when true then true
       when 't' then true
       when 'T' then true
       when 'true' then true
