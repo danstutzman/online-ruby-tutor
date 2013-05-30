@@ -5,7 +5,7 @@ require 'timeout'
 class InstructionLimitReached < Exception
 end
 
-$___MAX_INSTRUCTIONS_LIMIT = 300
+$___MAX_INSTRUCTIONS_LIMIT = 500
 $___MAX_SECONDS_TO_COMPLETE = 1
 
 $___PREFIX = "
@@ -358,6 +358,37 @@ def fake_active_record_class_definition(class_name, column_name_to_type,
   end"
   methods.push save_bang_method
 
+  where_method  = "  def self.where(conditions)\n"
+  where_method += "    results = []\n"
+  # synthesize some data
+  where_method += "    result = #{class_name}.new\n"
+  column_name_to_type.each do |name, type|
+    if type == Fixnum
+      where_method += "    result.#{name} = 9\n"
+    elsif type == String
+      where_method += "    result.#{name} = 'abc'\n"
+    elsif type == TrueClass
+      where_method += "    result.#{name} = true\n"
+    else
+      raise "Unknown type for column name #{name}"
+    end
+  end
+  where_method += "    result.save\n"
+  where_method += "    results.push result\n"
+  where_method += "    results\n"
+  where_method += "  end"
+  methods.push where_method
+
+  all_method = "  def self.all
+    self.where({}).all
+  end"
+  methods.push all_method
+
+  first_method = "  def self.first
+    self.where({}).first
+  end"
+  methods.push first_method
+
   return "class #{class_name}\n" + methods.join("\n") + "\n  end\n"
 end
 
@@ -374,7 +405,6 @@ if $0 == "get_trace_for.rb"
 thing.planted_year = '3'
 thing.seed_type = ''
 thing.is_unused = true
-thing.save!
-puts thing.valid?
+puts GardenPlot.first.inspect
 ", [{}])
 end
