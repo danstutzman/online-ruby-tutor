@@ -253,35 +253,84 @@ def get_trace_for_cases(___user_code, ___cases)
   }
 end
 
-if $0 == "get_trace_for.rb"
-  pp get_trace_for_cases('
-class Thing
-  def initialize
+CLASS_NAME_REGEX = /^[A-Z][A-Za-z0-9_]*$/
+COLUMN_NAME_REGEX = /^[a-z][a-z0-9_]*$/
+def fake_active_record_class_definition(class_name, column_name_to_type)
+  if !CLASS_NAME_REGEX.match(class_name)
+    raise "Class name #{class_name} doesn't match regex #{CLASS_NAME_REGEX}"
+  end
+
+  methods = []
+
+  initialize_method = "  def initialize
     @attributes = {}
-    @attributes[:id] = nil
-    @attributes[:seed_type] = nil
-    @attributes[:planted_year] = nil
+  "
+  column_name_to_type.each do |name, type|
+    initialize_method += "  @attributes[:#{name}] = nil\n"
   end
-  def id
-    @attributes[:id]
+  initialize_method += "end"
+  methods.push(initialize_method)
+
+  column_name_to_type.each do |name, type|
+    if !COLUMN_NAME_REGEX.match(name)
+      raise "Column name #{name} doesn't match regex #{COLUMN_NAME_REGEX}"
+    end
+    if type == Fixnum
+      methods.push "  def #{name}
+    @attributes[:#{name}]
+  end"
+      methods.push "  def #{name}=(new_value)
+    @attributes[:#{name}] = (new_value == nil) ? nil : new_value.to_i
+  end"
+    elsif type == String
+      methods.push "  def #{name}
+    @attributes[:#{name}]
+  end"
+      methods.push "  def #{name}=(new_value)
+    @attributes[:#{name}] = (new_value == nil) ? nil : new_value.to_s
+  end"
+    elsif type == TrueClass
+      methods.push "  def #{name}
+    @attributes[:#{name}]
+  end"
+      methods.push "  def #{name}=(new_value)
+    @attributes[:#{name}] = case new_value
+      when nil then nil
+      when '' then nil
+      when 't' then true
+      when 'T' then true
+      when 'true' then true
+      when 'TRUE' then true
+      else false
+    end
+  end"
+    else
+      raise "Unknown type for column name #{name}"
+    end
   end
-  def id=(new_value)
-    @attributes[:id] = (new_value == nil) ? nil : new_value.to_i
-  end
-  def planted_year
-    @attributes[:planted_year]
-  end
-  def planted_year=(new_value)
-    @attributes[:planted_year] = (new_value == nil) ? nil : new_value.to_i
-  end
-  def inspect
-    class_name = self.class.to_s
-    pairs = @attributes.map { |key, value| "#{key}: #{value.inspect}" }
-    "#<" + class_name + " " + pairs.join(", ") + ">"
-  end
+
+  inspect_method = %Q[  def inspect
+    pairs = @attributes.map { |key, value| "\#{key}: \#{value.inspect}" }
+      "#<#{class_name} " + pairs.join(", ") + ">"
+    end]
+  methods.push inspect_method
+
+  return "class #{class_name}\n" + methods.join("\n") + "\n  end\n"
 end
-thing = Thing.new
-thing.planted_year = "3"
+
+if $0 == "get_trace_for.rb"
+  class_def = fake_active_record_class_definition("GardenPlot", {
+    id: Fixnum,
+    planted_year: Fixnum,
+    seed_type: String,
+    is_unused: TrueClass,
+  })
+  puts class_def
+  pp get_trace_for_cases(class_def + "
+thing = GardenPlot.new
+thing.planted_year = '3'
+thing.seed_type = 'corn'
+thing.is_unused = true
 puts thing.inspect
-', [{}])
+", [{}])
 end
