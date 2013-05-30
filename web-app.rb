@@ -178,7 +178,7 @@ get '/' do
       :is_current   => true
     }).first
   @user_code = (old_record || Save.new).code || ''
-  @traces = get_trace_for_cases(@user_code, [{}])
+  @traces = get_trace_for_cases('', @user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
@@ -205,7 +205,7 @@ post '/' do
       :code         => @user_code,
     })
   end
-  @traces = get_trace_for_cases(@user_code, [{}])
+  @traces = get_trace_for_cases('', @user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
@@ -299,7 +299,7 @@ match '/exercise/:task_id' do |task_id|
 
   cases_given =
     (@exercise['cases'] || [{}]).map { |_case| _case['given'] || {} }
-  @traces = get_trace_for_cases(@user_code, cases_given)
+  @traces = get_trace_for_cases('', @user_code, cases_given)
 
   num_passed = 0
   num_failed = 0
