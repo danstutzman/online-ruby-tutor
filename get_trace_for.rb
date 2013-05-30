@@ -315,6 +315,22 @@ def fake_active_record_class_definition(class_name, column_name_to_type)
     end]
   methods.push inspect_method
 
+  save_method = "  def save
+    if @attributes[:id].nil?
+      @attributes[:id] = 1
+    end
+    true
+  end"
+  methods.push save_method
+
+  save_bang_method = "  def save!
+    if @attributes[:id].nil?
+      @attributes[:id] = 1
+    end
+    true
+  end"
+  methods.push save_bang_method
+
   return "class #{class_name}\n" + methods.join("\n") + "\n  end\n"
 end
 
@@ -331,6 +347,7 @@ thing = GardenPlot.new
 thing.planted_year = '3'
 thing.seed_type = 'corn'
 thing.is_unused = true
+thing.save!
 puts thing.inspect
 ", [{}])
 end
