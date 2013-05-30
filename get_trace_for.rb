@@ -254,9 +254,34 @@ def get_trace_for_cases(___user_code, ___cases)
 end
 
 if $0 == "get_trace_for.rb"
-  pp get_trace_for_cases("
-puts 'a'
-puts 'b'
-puts 'c'
-", [{:a => 3}])
+  pp get_trace_for_cases('
+class Thing
+  def initialize
+    @attributes = {}
+    @attributes[:id] = nil
+    @attributes[:seed_type] = nil
+    @attributes[:planted_year] = nil
+  end
+  def id
+    @attributes[:id]
+  end
+  def id=(new_value)
+    @attributes[:id] = (new_value == nil) ? nil : new_value.to_i
+  end
+  def planted_year
+    @attributes[:planted_year]
+  end
+  def planted_year=(new_value)
+    @attributes[:planted_year] = (new_value == nil) ? nil : new_value.to_i
+  end
+  def inspect
+    class_name = self.class.to_s
+    pairs = @attributes.map { |key, value| "#{key}: #{value.inspect}" }
+    "#<" + class_name + " " + pairs.join(", ") + ">"
+  end
+end
+thing = Thing.new
+thing.planted_year = "3"
+puts thing.inspect
+', [{}])
 end
