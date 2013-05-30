@@ -26,13 +26,15 @@ UserCode.untrust
 $SAFE = 4
 module UserCode
 begin
+___erb_out = (catch(:halt) do
 "
 # Note: we'll define $___NUM_PREFIX_LINES later
 $___SUFFIX = "
+end) # end catch
 rescue => ___e
   ___e
-end
-end
+end # end rescue
+end # end module
 "
 $___NUM_SUFFIX_LINES = $___SUFFIX.split("\n").size
 
@@ -393,19 +395,27 @@ def fake_active_record_class_definition(class_name, column_name_to_type,
   return "class #{class_name}\n" + methods.join("\n") + "\n  end\n"
 end
 
+def def_response_methods; "
+  def self.erb(page_name)
+    return '<html></html>'
+  end
+  def self.halt(html)
+    throw :halt, html
+  end
+  def self.redirect(path)
+    throw :halt, path
+  end"
+end
+
 if $0 == "get_trace_for.rb"
-  class_def = fake_active_record_class_definition("GardenPlot", {
+  definitions = ''
+  definitions += fake_active_record_class_definition("GardenPlot", {
     id: Fixnum,
     planted_year: Fixnum,
     seed_type: String,
     is_unused: TrueClass,
   }, [:seed_type])
-  puts class_def
-  pp get_trace_for_cases(class_def,
-"thing = GardenPlot.new
-thing.planted_year = '3'
-thing.seed_type = ''
-thing.is_unused = true
-puts GardenPlot.first.inspect
-", [{}])
+  definitions += def_response_methods()
+  puts definitions
+  pp get_trace_for_cases(definitions, "puts 123", [{}])
 end
