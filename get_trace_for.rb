@@ -27,7 +27,7 @@ $SAFE = 4
 module UserCode
 begin
 "
-$___NUM_PREFIX_LINES = $___PREFIX.split("\n").size + 1 # + 1 for assignments
+# Note: we'll define $___NUM_PREFIX_LINES later
 $___SUFFIX = "
 rescue => ___e
   ___e
@@ -144,7 +144,7 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
   end
 }
 
-def ___get_trace_for_internal(___user_code, ___assignments)
+def ___get_trace_for_internal(___system_code, ___user_code, ___assignments)
   $___traces = []
   $___max_frame_id = 0
   $___stack_to_render = [{
@@ -159,19 +159,29 @@ def ___get_trace_for_internal(___user_code, ___assignments)
     "ordered_varnames" => nil, # fill out
   }]
 
-  ___assignment_line = ___assignments.map { |___assignment_key, ___assignment_value|
+  ___assignment_line = ___assignments.map {
+    |___assignment_key, ___assignment_value|
     "#{___assignment_key} = #{___assignment_value.inspect}"
   }.join('; ') + "\n"
 
+  $___NUM_PREFIX_LINES = $___PREFIX.split("\n").size + 1 # + 1 for assignments
+  $___NUM_PREFIX_LINES += ___system_code.split("\n").size
+
   begin
     set_trace_func $___trace_func
-    eval($___PREFIX + ___assignment_line + ___user_code + $___SUFFIX)
+    eval(
+      $___PREFIX +
+      ___system_code +
+      ___assignment_line +
+      ___user_code +
+      $___SUFFIX
+    )
   ensure
     set_trace_func nil
   end
 end
 
-def get_trace_for_case(___user_code, ___assignments)
+def get_trace_for_case(___system_code, ___user_code, ___assignments)
   $___user_code_num_lines = ___user_code.chomp.split("\n").size
   $___num_instructions_so_far = 0
   begin
@@ -181,7 +191,8 @@ def get_trace_for_case(___user_code, ___assignments)
         $0 = $PROGRAM_NAME = "ruby" # for security
         ___user_code_changed = ___user_code.gsub(/^def ([a-z_])/, "def self.\\1")
         #puts ___user_code
-        ___get_trace_for_internal(___user_code_changed, ___assignments)
+        ___get_trace_for_internal(
+          ___system_code, ___user_code_changed, ___assignments)
       }.value
     end
     if Exception === returned
@@ -247,15 +258,16 @@ def get_trace_for_case(___user_code, ___assignments)
   }
 end
 
-def get_trace_for_cases(___user_code, ___cases)
+def get_trace_for_cases(___system_code, ___user_code, ___cases)
   ___cases.map { |___assignments|
-    get_trace_for_case(___user_code, ___assignments)
+    get_trace_for_case(___system_code, ___user_code, ___assignments)
   }
 end
 
 CLASS_NAME_REGEX = /^[A-Z][A-Za-z0-9_]*$/
 COLUMN_NAME_REGEX = /^[a-z][a-z0-9_]*$/
-def fake_active_record_class_definition(class_name, column_name_to_type)
+def fake_active_record_class_definition(class_name, column_name_to_type,
+    validates_presence_of_column_names)
   if !CLASS_NAME_REGEX.match(class_name)
     raise "Class name #{class_name} doesn't match regex #{CLASS_NAME_REGEX}"
   end
@@ -264,11 +276,12 @@ def fake_active_record_class_definition(class_name, column_name_to_type)
 
   initialize_method = "  def initialize
     @attributes = {}
+    @errors = []
   "
   column_name_to_type.each do |name, type|
-    initialize_method += "  @attributes[:#{name}] = nil\n"
+    initialize_method += "    @attributes[:#{name}] = nil\n"
   end
-  initialize_method += "end"
+  initialize_method += "  end"
   methods.push(initialize_method)
 
   column_name_to_type.each do |name, type|
@@ -311,23 +324,36 @@ def fake_active_record_class_definition(class_name, column_name_to_type)
 
   inspect_method = %Q[  def inspect
     pairs = @attributes.map { |key, value| "\#{key}: \#{value.inspect}" }
-      "#<#{class_name} " + pairs.join(", ") + ">"
-    end]
+    "#<#{class_name} " + pairs.join(", ") + ">"
+  end]
   methods.push inspect_method
 
+  valid_question_method = "  def valid?\n"
+  valid_question_method += "    @errors = []\n"
+  validates_presence_of_column_names.each do |name|
+    valid_question_method +=
+      "    if @attributes[:#{name}] == nil || @attributes[:#{name}] == ''\n"
+    valid_question_method += "      @errors.push \"#{name} can't be blank\"\n"
+    valid_question_method += "    end\n"
+  end
+  valid_question_method += "    @errors.size == 0\n"
+  valid_question_method += "  end"
+  methods.push valid_question_method
+
   save_method = "  def save
-    if @attributes[:id].nil?
-      @attributes[:id] = 1
+    if valid?
+      if @attributes[:id].nil?
+        @attributes[:id] = 1
+      end
+      true
+    else
+      false
     end
-    true
   end"
   methods.push save_method
 
   save_bang_method = "  def save!
-    if @attributes[:id].nil?
-      @attributes[:id] = 1
-    end
-    true
+    self.save or raise(\"ActiveRecord::RecordInvalid: Validation failed: \" + @errors.join(', '))
   end"
   methods.push save_bang_method
 
@@ -340,14 +366,14 @@ if $0 == "get_trace_for.rb"
     planted_year: Fixnum,
     seed_type: String,
     is_unused: TrueClass,
-  })
+  }, [:seed_type])
   puts class_def
-  pp get_trace_for_cases(class_def + "
-thing = GardenPlot.new
+  pp get_trace_for_cases(class_def,
+"thing = GardenPlot.new
 thing.planted_year = '3'
-thing.seed_type = 'corn'
+thing.seed_type = ''
 thing.is_unused = true
 thing.save!
-puts thing.inspect
+puts thing.valid?
 ", [{}])
 end
