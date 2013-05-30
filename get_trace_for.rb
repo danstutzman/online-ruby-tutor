@@ -99,7 +99,8 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
       end
     end
 
-    locals = binding.eval('local_variables')
+    locals = binding.eval('local_variables') +
+             binding.eval('instance_variables')
     local_values = {}
     locals.reject! { |local_name| local_name.to_s.start_with?('___') }
     locals.each do |local_name|
