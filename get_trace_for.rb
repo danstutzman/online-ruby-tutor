@@ -38,6 +38,8 @@ end # end module
 "
 $___NUM_SUFFIX_LINES = $___SUFFIX.split("\n").size
 
+$___user_class_names = []
+
 $___trace_func = proc { |event, file, line, id, binding, classname|
   #p [event, file, line, id]
 
@@ -92,6 +94,13 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
             }
           when Proc
             ["FUNCTION", "line #{value.source_location[1] - $___NUM_PREFIX_LINES}", nil]
+        end
+        heap[value.object_id] = on_heap
+        return ['REF', value.object_id]
+      elsif $___user_class_names.include?(value.class.to_s)
+        on_heap = ["INSTANCE", value.class.to_s.gsub(/^UserCode::/, '')]
+        value.instance_variable_get('@attributes').each do |name, value|
+          on_heap.push [name, value]
         end
         heap[value.object_id] = on_heap
         return ['REF', value.object_id]
@@ -262,6 +271,14 @@ def get_trace_for_case(___system_code, ___user_code, ___assignments)
 end
 
 def get_trace_for_cases(___system_code, ___user_code, ___cases)
+  ___system_code = fake_active_record_class_definition("GardenPlot", {
+    id: Fixnum,
+    planted_year: Fixnum,
+    seed_type: String,
+    is_unused: TrueClass,
+  }, [:seed_type])
+  $___user_class_names.push "UserCode::GardenPlot"
+
   ___cases.map { |___assignments|
     get_trace_for_case(___system_code, ___user_code, ___assignments)
   }
