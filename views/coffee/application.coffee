@@ -22,14 +22,13 @@ changePythonToRuby = ->
         when 'function' then 'Proc'
         else labelNode.nodeValue
   
-  # Change 'a b' to a(newline)b
+  # "a\n'b" should be rendered as a(next line)'b not "a \'b"
   $('span.stringObj').each (i) ->
     s = this
     sNode = s.childNodes[0]
     if sNode
-      sNode.nodeValue = sNode.nodeValue.replace(/^"([\s\S]*)"$/, '$1')
-      s.innerHTML = sNode.nodeValue.replace(/\\'/g, '\'')
-      s.innerHTML = sNode.nodeValue.replace(/\n/g, '<br>')
+      without_dquotes = sNode.nodeValue.replace(/^"([\s\S]*)"$/, '$1')
+      sNode.nodeValue = without_dquotes.replace(/\\'/g, '\'')
 
   $('#pyCodeOutput').click ->
     $('#trace_render_div').hide()
