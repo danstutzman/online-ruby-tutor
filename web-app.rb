@@ -163,7 +163,12 @@ helpers do
 end
 
 before do
-  if ['/auth/google_oauth2/callback', '/auth/failure', '/login'].include?(request.path_info)
+  if %w[
+    /auth/google_oauth2/callback
+    /auth/failure
+    /login
+    /ping
+  ].include?(request.path_info)
     pass
   elsif !authenticated?
     redirect '/login'
@@ -393,6 +398,11 @@ match '/saves/:task_id' do |task_id|
   @task_id = task_id
   @saves = Save.where(:is_current => true, :task_id => task_id).order(:id)
   haml :saves
+end
+
+get '/ping' do
+  User.first
+  "OK\n"
 end
 
 after do
