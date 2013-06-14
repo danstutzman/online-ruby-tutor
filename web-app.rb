@@ -248,6 +248,7 @@ match '/exercise/:task_id' do |task_id|
 
   exercise = Exercise.find_by_task_id(task_id)
   halt(404, 'Exercise not found') if exercise.nil?
+  halt(404, 'No code for that exercise') if exercise.yaml.nil?
   begin
     @exercise = YAML.load(exercise.yaml)
   rescue Psych::SyntaxError => e
