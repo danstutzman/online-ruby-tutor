@@ -45,9 +45,10 @@
                   .test-status{ :class => trace['test_status'].downcase }
                     = trace['test_status']
         .filler.filler-tall
-          logged in as
-          = @current_user && @current_user.first_name
-          %button(name='logout' value='logout') Logout
+          - if @current_user
+            logged in as
+            = @current_user.first_name
+            %button(name='logout' value='logout') Logout
 
       #edit-content
         - if params['exercise_num']

@@ -76,6 +76,9 @@ end
 class Save < ActiveRecord::Base
 end
 
+class RootSave < ActiveRecord::Base
+end
+
 class Exercise < ActiveRecord::Base
   if ENV['STUDENT_CHECKLIST_DATABASE_URL'] # Heroku
     db = URI.parse(ENV['STUDENT_CHECKLIST_DATABASE_URL'])
@@ -162,27 +165,11 @@ helpers do
   end
 end
 
-before do
-  if %w[
-    /auth/google_oauth2/callback
-    /auth/failure
-    /login
-    /ping
-  ].include?(request.path_info)
-    pass
-  elsif !authenticated?
-    redirect '/login'
-  end
-end
-
 get '/' do
-  old_record =
-    Save.where({
-      :user_id      => @current_user.id,
-      :task_id      => '/',
-      :is_current   => true
-    }).first
-  @user_code = (old_record || Save.new).code || ''
+  if session[:root_save_id]
+    old_record = RootSave.find(session[:root_save_id])
+  end
+  @user_code = (old_record || RootSave.new).code || ''
   @traces = get_trace_for_cases('', @user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
@@ -197,19 +184,15 @@ post '/' do
     redirect '/'
   end
   @user_code = params['user_code_textarea']
-  Save.transaction do
-    Save.update_all("is_current = 'f'", {
-      :user_id      => @current_user.id,
-      :task_id      => '/',
-      :is_current   => true
-    })
-    Save.create({
-      :user_id      => @current_user.id,
-      :task_id      => '/',
-      :is_current   => true,
-      :code         => @user_code,
-    })
+  if session[:root_save_id]
+    RootSave.update_all("is_current = 'f'", { id: session[:root_save_id] })
   end
+  new_root_save = RootSave.create({
+    :user_id      => @current_user ? @current_user.id : nil,
+    :is_current   => true,
+    :code         => @user_code,
+  })
+  session[:root_save_id] = new_root_save.id
   @traces = get_trace_for_cases('', @user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
@@ -234,7 +217,9 @@ get '/auth/google_oauth2/callback' do
   uid = response['uid']
   session[:google_plus_user_id] = uid
   if authenticated?
-    redirect "/"
+    original_destination = session[:original_destination]
+    session[:original_destination] = nil
+    redirect original_destination || "/"
   else
     session[:google_plus_user_id] = nil
     redirect "/auth/failure?message=Sorry,+you're+not+on+the+list.+Contact+dtstutz@gmail.com+to+be+added."
@@ -251,6 +236,11 @@ get '/login' do
 end
 
 match '/exercise/:task_id' do |task_id|
+  if !authenticated?
+    session[:original_destination] = request.path_info
+    redirect '/login'
+  end
+
   if params['logout']
     session[:google_plus_user_id] = nil
     redirect '/'
@@ -358,15 +348,22 @@ get '/js/application.js' do
 end
 
 get '/users' do
-  if !@current_user.is_admin
+  if !authenticated?
+    session[:original_destination] = request.path_info
+    redirect '/login'
+  elsif !@current_user.is_admin
     redirect '/auth/failure?message=You+must+be+an+admin+to+edit+users'
   end
+
   @users = User.order('id')
   haml :users
 end
 
 post '/users' do
-  if !@current_user.is_admin
+  if !authenticated?
+    session[:original_destination] = request.path_info
+    redirect '/login'
+  elsif !@current_user.is_admin
     redirect '/auth/failure?message=You+must+be+an+admin+to+edit+users'
   end
 
@@ -395,6 +392,11 @@ post '/users' do
 end
 
 match '/saves/:task_id' do |task_id|
+  if !authenticated?
+    session[:original_destination] = request.path_info
+    redirect '/login'
+  end
+
   @task_id = task_id
   @saves = Save.where(:is_current => true, :task_id => task_id).order(:id)
   haml :saves
