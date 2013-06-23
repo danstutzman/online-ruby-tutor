@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 cd `dirname $0`
 git push
 ORIGINAL_DIR=`pwd`
