@@ -113,3 +113,20 @@
                     = trace['test_status']
 
           %div{ :id => "trace_render_div#{i}" }
+
+      .footer
+        Online Ruby Tutor is (C) 2013
+        != succeed '.' do
+          %a(href='http://www.danielstutzman.com/') Daniel Stutzman
+        %a(href='https://github.com/danielstutzman/online-ruby-tutor/issues')<
+          File a bug
+        or
+        != succeed '.' do
+          %a(href='https://github.com/danielstutzman/online-ruby-tutor')<
+            submit a pull request
+        Visualizations drawn by
+        %a(href='http://pythontutor.com/') Online Python Tutor
+        by
+        != succeed '.' do
+          %a(href='http://www.pgbovine.net/') Philip Guo
+
