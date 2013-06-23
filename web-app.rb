@@ -165,11 +165,27 @@ helpers do
   end
 end
 
+SAMPLE_CODE =
+"def binary_search(haystack, needle)
+  mid = haystack.size / 2
+  if needle < haystack[mid]
+    __return__ = binary_search(haystack[0..(mid - 1)], needle)
+  elsif needle > haystack[mid]
+    __return__ = (mid + 1) + binary_search(haystack[(mid + 1)..-1], needle)
+  else
+    __return__ = mid
+  end
+end
+puts binary_search([4, 9, 12, 13, 17, 18], 17)
+"
+
 get '/' do
   if session[:root_save_id]
-    old_record = RootSave.find(session[:root_save_id])
+    @user_code = RootSave.find(session[:root_save_id]).code || ''
   end
-  @user_code = (old_record || RootSave.new).code || ''
+  if @user_code.nil? || @user_code == ''
+    @user_code = SAMPLE_CODE
+  end
   @traces = get_trace_for_cases('', @user_code, [{}])
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
