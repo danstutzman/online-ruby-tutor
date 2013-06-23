@@ -73,42 +73,6 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
 
   if (event == 'line' || event == 'call' || event == 'return' || event == 'end') && file == '(eval)'
     #printf "%8s %s:%-2d %10s %8s\n", event, file, line, id, classname
-    
-    heap = {}
-    def represent_value(value, heap)
-      if [Fixnum, NilClass, Symbol,
-          TrueClass, FalseClass, Float].include?(value.class)
-        return value
-      elsif String === value
-        return value.clone
-      elsif [Array, Hash, Proc].include?(value.class)
-        on_heap = case value
-          when Array
-            ["LIST"] + value.map { |element|
-              represent_value(element, heap)
-            }
-          when Hash
-            ["DICT"] + value.map { |key, val|
-              [represent_value(key, heap),
-               represent_value(val, heap)]
-            }
-          when Proc
-            ["FUNCTION", "line #{value.source_location[1] - $___NUM_PREFIX_LINES}", nil]
-        end
-        heap[value.object_id] = on_heap
-        return ['REF', value.object_id]
-      elsif $___user_class_names.include?(value.class.to_s)
-        on_heap = ["INSTANCE", value.class.to_s.gsub(/^UserCode::/, '')]
-        value.instance_variable_get('@attributes').each do |name, value|
-          on_heap.push [name, value]
-        end
-        heap[value.object_id] = on_heap
-        return ['REF', value.object_id]
-      else
-        #puts "Don't know type #{value.class}"
-        value.class.to_s
-      end
-    end
 
     locals = binding.eval('local_variables') +
              binding.eval('instance_variables')
@@ -116,14 +80,15 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     locals.reject! { |local_name| local_name.to_s.start_with?('___') }
     locals.each do |local_name|
       value = binding.eval(local_name.to_s)
-      local_values[local_name.to_s] = represent_value(value, heap)
+      local_values[local_name.to_s] = represent_value_simple(value)
     end
 
     if $___stack_to_render.last
       $___stack_to_render.last['encoded_locals'] = local_values.clone
       $___stack_to_render.last['ordered_varnames'] = locals.clone
       $___stack_to_render.last['is_highlighted'] = (event == 'call')
-      $___stack_to_render.last['unique_hash'] = id.to_s
+      $___stack_to_render.last['unique_hash'] =
+        "#{$___stack_to_render.last['frame_id']}_#{id}"
     end
 
     stdout = StringIO.new
@@ -138,7 +103,29 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
         stdout.print(*args)
       end
     end
-  
+
+    object_ids = {}
+    $___stack_to_render.each do |frame|
+      frame['encoded_locals'].each do |key, value|
+        if value.respond_to?(:[]) && value[0] == 'REF'
+          object_ids[value[1]] = true
+        end
+      end
+    end
+
+    heap = {}
+    object_ids.keys.each do |object_id|
+      value = binding.eval("ObjectSpace._id2ref(#{object_id})")
+      represent_value(value, heap)
+    end
+
+    frame_ids = []
+    $___stack_to_render.each_with_index do |frame, i|
+      frame['is_parent'] = (i < $___stack_to_render.size - 1)
+      frame['parent_frame_id_list'] = frame_ids.clone
+      frame_ids.push frame['frame_id']
+    end
+
     num_lines_over = (line - $___NUM_PREFIX_LINES) - $___user_code_num_lines
     if line > $___NUM_PREFIX_LINES && num_lines_over < $___NUM_SUFFIX_LINES + 1
       trace = {
@@ -155,6 +142,55 @@ $___trace_func = proc { |event, file, line, id, binding, classname|
     end
   end
 }
+
+def represent_value_simple(value)
+  if [Fixnum, NilClass, Symbol,
+      TrueClass, FalseClass, Float].include?(value.class)
+    return value
+  elsif String === value
+    return value.clone
+  elsif [Array, Hash, Proc].include?(value.class)
+    return ['REF', value.object_id]
+  elsif $___user_class_names.include?(value.class.to_s)
+    return ['REF', value.object_id]
+  else
+    value.class.to_s
+  end
+end
+
+def represent_value(value, heap)
+  if [Fixnum, NilClass, Symbol,
+      TrueClass, FalseClass, Float].include?(value.class)
+    return value
+  elsif String === value
+    return value.clone
+  elsif [Array, Hash, Proc].include?(value.class)
+    on_heap = case value
+      when Array
+        ["LIST"] + value.map { |element|
+          represent_value(element, heap)
+        }
+      when Hash
+        ["DICT"] + value.map { |key, val|
+          [represent_value(key, heap),
+           represent_value(val, heap)]
+        }
+      when Proc
+        ["FUNCTION", "line #{value.source_location[1] - $___NUM_PREFIX_LINES}", nil]
+    end
+    heap[value.object_id] = on_heap
+    return ['REF', value.object_id]
+  elsif $___user_class_names.include?(value.class.to_s)
+    on_heap = ["INSTANCE", value.class.to_s.gsub(/^UserCode::/, '')]
+    value.instance_variable_get('@attributes').each do |name, value|
+      on_heap.push [name, value]
+    end
+    heap[value.object_id] = on_heap
+    return ['REF', value.object_id]
+  else
+    value.class.to_s
+  end
+end
 
 def ___get_trace_for_internal(___system_code, ___user_code, ___assignments)
   $___traces = []
