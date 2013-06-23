@@ -18,6 +18,7 @@
   - apt: "pkg=postgresql"
   - apt: "pkg=libpq-dev"
   - apt: "pkg=libsqlite3-dev"
+  - apt: "pkg=nodejs"
 
   - command: mkdir /var/lib/postgresql/.ssh creates=/var/lib/postgresql/.ssh
   - command: chown postgres:postgres /var/lib/postgresql/.ssh
