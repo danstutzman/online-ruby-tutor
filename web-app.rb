@@ -20,7 +20,10 @@ if File.exists?(config_path)
   if env == 'production'
     set :static_cache_control, [:public, :max_age => 300]
     set :sass, { :style => :compressed }
-    Airbrake.configure { |config| config.api_key = CONFIG['AIRBRAKE_API_KEY'] }
+    Airbrake.configure do |config|
+      config.api_key = CONFIG['AIRBRAKE_API_KEY']
+      config.ignore << 'Sinatra::NotFound'
+    end
   else
     set :port, 4001
     set :static_cache_control, [:public, :no_cache]
