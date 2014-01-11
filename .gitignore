@@ -3,3 +3,4 @@ config.yaml
 users.sql
 database.sqlite3
 .sass-cache
+.vagrant

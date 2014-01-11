@@ -18,6 +18,10 @@ GEM
       json
     arel (3.0.2)
     builder (3.0.4)
+    capistrano (3.0.1)
+      i18n
+      rake (>= 10.0.0)
+      sshkit (>= 0.0.23)
     coffee-script (2.2.0)
       coffee-script-source
       execjs
@@ -39,6 +43,9 @@ GEM
       multi_json (>= 1.5)
     multi_json (1.6.1)
     multipart-post (1.2.0)
+    net-scp (1.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.7.0)
     oauth2 (0.8.1)
       faraday (~> 0.8)
       httpauth (~> 0.1)
@@ -58,17 +65,25 @@ GEM
     rack (1.5.2)
     rack-protection (1.3.2)
       rack
+    rake (10.1.1)
     sass (3.2.7)
     sinatra (1.3.4)
       rack (~> 1.4)
       rack-protection (~> 1.3)
       tilt (~> 1.3, >= 1.3.3)
     sqlite3 (1.3.7)
+    sshkit (1.3.0)
+      net-scp (>= 1.1.2)
+      net-ssh
+      term-ansicolor
+    term-ansicolor (1.2.2)
+      tins (~> 0.8)
     thin (1.5.0)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
       rack (>= 1.0.0)
     tilt (1.3.3)
+    tins (0.13.1)
     tzinfo (0.3.37)
 
 PLATFORMS
@@ -77,6 +92,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   airbrake
+  capistrano (~> 3.0.1)
   coffee-script
   erubis
   haml
