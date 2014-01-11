@@ -1,0 +1,6 @@
+default['online-ruby-tutor']['user'] = 'deployer'
+default['online-ruby-tutor']['group'] = 'deployer'
+default['online-ruby-tutor']['database']['username'] = 'online_ruby_tutor'
+default['online-ruby-tutor']['database']['password'] = 'online_ruby_tutor'
+default['online-ruby-tutor']['database']['database'] = 'online_ruby_tutor'
+default['postgresql']['password']['postgres'] = 'postgres'
