@@ -20,9 +20,11 @@ if File.exists?(config_path)
   if env == 'production'
     set :static_cache_control, [:public, :max_age => 300]
     set :sass, { :style => :compressed }
-    Airbrake.configure do |config|
-      config.api_key = CONFIG['AIRBRAKE_API_KEY']
-      config.ignore << 'Sinatra::NotFound'
+    if CONFIG['AIRBRAKE_API_KEY']
+      Airbrake.configure do |config|
+        config.api_key = CONFIG['AIRBRAKE_API_KEY']
+        config.ignore << 'Sinatra::NotFound'
+      end
     end
   else
     set :port, 4001
@@ -64,11 +66,13 @@ use Rack::Session::Cookie, {
   :secret => CONFIG['COOKIE_SIGNING_SECRET'],
 }
 
-use OmniAuth::Builder do
-  provider :google_oauth2, CONFIG['GOOGLE_KEY'], CONFIG['GOOGLE_SECRET'], {
-    :scope => 'https://www.googleapis.com/auth/plus.me',
-    :access_type => 'online',
-  }
+if CONFIG['GOOGLE_KEY']
+  use OmniAuth::Builder do
+    provider :google_oauth2, CONFIG['GOOGLE_KEY'], CONFIG['GOOGLE_SECRET'], {
+      :scope => 'https://www.googleapis.com/auth/plus.me',
+      :access_type => 'online',
+    }
+  end
 end
 
 use Airbrake::Sinatra
