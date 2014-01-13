@@ -1,5 +1,5 @@
 {
-  "id" : "deploy",
+  "id" : "online-ruby-tutor",
   "groups" : [ "admin" ],
   "shell" : "/bin/bash",
   "comment" : "Deploy User",
