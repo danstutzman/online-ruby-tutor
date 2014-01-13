@@ -1,0 +1,7 @@
+{
+  "id" : "online-ruby-tutor",
+  "google_key": null,
+  "google_secret": null,
+  "cookie_signing_secret": "just-for-dev",
+  "airbrake_api_key": null
+}

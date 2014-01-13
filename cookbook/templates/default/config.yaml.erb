@@ -1,7 +1,7 @@
-GOOGLE_KEY: '123456789012.apps.googleusercontent.com'
-GOOGLE_SECRET: 'a1a1a1a1a1a1a1a1a1a1a1a1'
-COOKIE_SIGNING_SECRET: '12345abcdef'
-AIRBRAKE_API_KEY: '0123456789abcdef0123456789abcdef'
+GOOGLE_KEY: <%= @google_key.inspect %>
+GOOGLE_SECRET: <%= @google_secret.inspect %>
+COOKIE_SIGNING_SECRET: <%= @cookie_signing_secret.inspect %>
+AIRBRAKE_API_KEY: <%= @airbrake_api_key.inspect %>
 STUDENT_CHECKLIST_HOSTNAME:
   development: 'localhost:4002'
   production: 'www.davincicoders.info'
@@ -13,16 +13,17 @@ DATABASE_PARAMS:
     host:     localhost
     adapter:  postgresql
     username: online_ruby_tutor
-    password: whatever
+    password: online_ruby_tutor
     database: online_ruby_tutor
     encoding: unicode
   student_checklist_development:
     adapter: sqlite3
-    database: ../student-checklist/database.sqlite3
+#    database: ../student-checklist/database.sqlite3
+    database: database.sqlite3
   student_checklist_production:
     host:     localhost
     adapter:  postgresql
     username: student_checklist
-    password: whatever
+    password: student_checklist
     database: student_checklist
     encoding: unicode

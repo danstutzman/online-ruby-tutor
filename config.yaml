@@ -1,0 +1,29 @@
+GOOGLE_KEY: nil
+GOOGLE_SECRET: nil
+COOKIE_SIGNING_SECRET: 'just-for-dev'
+AIRBRAKE_API_KEY: nil
+STUDENT_CHECKLIST_HOSTNAME:
+  development: 'localhost:4002'
+  production: 'www.davincicoders.info'
+DATABASE_PARAMS:
+  development:
+    adapter: sqlite3
+    database: database.sqlite3
+  production:
+    host:     localhost
+    adapter:  postgresql
+    username: online_ruby_tutor
+    password: online_ruby_tutor
+    database: online_ruby_tutor
+    encoding: unicode
+  student_checklist_development:
+    adapter: sqlite3
+#    database: ../student-checklist/database.sqlite3
+    database: database.sqlite3
+  student_checklist_production:
+    host:     localhost
+    adapter:  postgresql
+    username: student_checklist
+    password: student_checklist
+    database: student_checklist
+    encoding: unicode

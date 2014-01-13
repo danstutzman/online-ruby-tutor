@@ -90,6 +90,23 @@ end
 #  #notifies :restart, 'service[nginx]', :delayed # will start if not started
 #end
 
+template '/var/www/online-ruby-tutor/shared/config.yaml' do
+  source 'config.yaml.erb'
+  owner node['online-ruby-tutor']['user']
+  group node['online-ruby-tutor']['group']
+  mode 0644
+  variables({
+    :google_key =>
+      data_bag_item('apps', 'online-ruby-tutor')['google_key'],
+    :google_secret =>
+      data_bag_item('apps', 'online-ruby-tutor')['google_secret'],
+    :cookie_signing_secret =>
+      data_bag_item('apps', 'online-ruby-tutor')['cookie_signing_secret'],
+    :airbrake_api_key =>
+      data_bag_item('apps', 'online-ruby-tutor')['airbrake_api_key']
+  })
+end
+
 include_recipe 'rbenv'
 include_recipe 'rbenv::ruby_build'
 
