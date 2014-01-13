@@ -10,3 +10,4 @@ depends 'apt', '~> 2.3.4'
 #depends 'postgresql'
 depends 'postgresql', '~> 3.2.0' # 3.2.0 to fix https://github.com/hw-cookbooks/postgresql/issues/94
 depends 'database'
+depends 'rbenv'

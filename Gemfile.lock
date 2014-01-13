@@ -18,10 +18,12 @@ GEM
       json
     arel (3.0.2)
     builder (3.0.4)
-    capistrano (3.0.1)
-      i18n
-      rake (>= 10.0.0)
-      sshkit (>= 0.0.23)
+    capistrano (2.15.5)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
     coffee-script (2.2.0)
       coffee-script-source
       execjs
@@ -36,6 +38,7 @@ GEM
     haml (4.0.0)
       tilt
     hashie (1.2.0)
+    highline (1.6.20)
     httpauth (0.2.0)
     i18n (0.6.1)
     json (1.7.7)
@@ -45,7 +48,11 @@ GEM
     multipart-post (1.2.0)
     net-scp (1.1.2)
       net-ssh (>= 2.6.5)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
     net-ssh (2.7.0)
+    net-ssh-gateway (1.2.0)
+      net-ssh (>= 2.6.5)
     oauth2 (0.8.1)
       faraday (~> 0.8)
       httpauth (~> 0.1)
@@ -65,15 +72,14 @@ GEM
     rack (1.5.2)
     rack-protection (1.3.2)
       rack
-    rake (10.1.1)
     sass (3.2.7)
     sinatra (1.3.4)
       rack (~> 1.4)
       rack-protection (~> 1.3)
       tilt (~> 1.3, >= 1.3.3)
     sqlite3 (1.3.7)
-    sshkit (1.3.0)
-      net-scp (>= 1.1.2)
+    sshkit (1.0.0)
+      net-scp
       net-ssh
       term-ansicolor
     term-ansicolor (1.2.2)
@@ -92,7 +98,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   airbrake
-  capistrano (~> 3.0.1)
+  capistrano (~> 2.15.4)
   coffee-script
   erubis
   haml
@@ -102,5 +108,6 @@ DEPENDENCIES
   sass
   sinatra
   sqlite3
+  sshkit (~> 1.0.0)
   thin
   tilt

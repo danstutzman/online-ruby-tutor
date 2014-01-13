@@ -4,7 +4,32 @@ user node['online-ruby-tutor']['user'] do
   group node['online-ruby-tutor']['group']
   system true
   shell '/bin/bash'
+  supports :manage_home => true
+  home "/home/#{node['online-ruby-tutor']['user']}"
 end
+
+directory "/home/#{node['online-ruby-tutor']['user']}/.ssh" do
+  action :create
+  owner  node['online-ruby-tutor']['user']
+  group  node['online-ruby-tutor']['group']
+  mode   '0700'
+end
+
+template "/home/#{node['online-ruby-tutor']['user']}/.ssh/authorized_keys" do
+  source 'authorized_keys.erb'
+  owner  node['online-ruby-tutor']['user']
+  group  node['online-ruby-tutor']['group']
+  mode  '0600'
+  variables :keys => data_bag_item('users', 'deploy')["ssh_keys"]
+end
+
+#file "/home/#{node['online-ruby-tutor']['user']}/.ssh/authorized_keys" do
+#  owner  node['online-ruby-tutor']['user']
+#  group  node['online-ruby-tutor']['group']
+#  mode  '0600'
+#  content ::File.open("/home/#{ENV['USER']}/.ssh/authorized_keys").read
+#  action :create
+#end
 
 include_recipe 'apt'
 
@@ -52,4 +77,35 @@ postgresql_database_user node['online-ruby-tutor']['database']['username'] do
   password      node['online-ruby-tutor']['database']['password']
   privileges    [:all]
   action        :grant
+end
+
+# Need Git for capistrano deploy
+apt_package 'git' do
+  action :install
+end
+
+#cookbook_file '/var/www/online-ruby-tutor/shared/config.yml' do
+#  source 'config.yml'
+#  action :create # will replace the file
+#  #notifies :restart, 'service[nginx]', :delayed # will start if not started
+#end
+
+include_recipe 'rbenv'
+include_recipe 'rbenv::ruby_build'
+
+directory "/var/www/online-ruby-tutor" do
+  owner node['online-ruby-tutor']['user']
+  group node['online-ruby-tutor']['group']
+  mode 00755
+  action :create
+end
+
+rbenv_ruby node['online-ruby-tutor']['ruby_version']
+
+rbenv_gem "bundler" do
+  ruby_version node['online-ruby-tutor']['ruby_version']
+end
+
+apt_package 'nodejs' do
+  action :install
 end
