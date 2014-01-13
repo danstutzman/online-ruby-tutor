@@ -11,6 +11,6 @@ gem 'sass'
 gem 'haml'
 gem 'coffee-script'
 gem 'airbrake', :group => 'production'
-gem 'thin', :group => 'production'
+gem 'thin', '~> 1.6.1', :group => 'production'
 gem 'sshkit', '~> 1.0.0' # fix https://github.com/capistrano/sshkit/issues/39
 gem 'capistrano', '~> 2.15.4'
