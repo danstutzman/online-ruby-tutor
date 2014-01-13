@@ -84,11 +84,21 @@ apt_package 'git' do
   action :install
 end
 
-#cookbook_file '/var/www/online-ruby-tutor/shared/config.yml' do
-#  source 'config.yml'
-#  action :create # will replace the file
-#  #notifies :restart, 'service[nginx]', :delayed # will start if not started
-#end
+%w[
+  /var/www/online-ruby-tutor
+  /var/www/online-ruby-tutor/shared
+  /var/www/online-ruby-tutor/shared/pids
+  /var/www/online-ruby-tutor/shared/log
+  /var/www/online-ruby-tutor/releases
+].each do |path|
+  directory path do
+    owner node['online-ruby-tutor']['user']
+    group node['online-ruby-tutor']['group']
+    mode 00755
+    action :create
+    recursive true
+  end
+end
 
 template '/var/www/online-ruby-tutor/shared/config.yaml' do
   source 'config.yaml.erb'
@@ -109,13 +119,6 @@ end
 
 include_recipe 'rbenv'
 include_recipe 'rbenv::ruby_build'
-
-directory "/var/www/online-ruby-tutor" do
-  owner node['online-ruby-tutor']['user']
-  group node['online-ruby-tutor']['group']
-  mode 00755
-  action :create
-end
 
 rbenv_ruby node['online-ruby-tutor']['ruby_version']
 
