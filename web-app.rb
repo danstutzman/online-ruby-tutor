@@ -16,7 +16,7 @@ require './get_trace_for.rb'
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
 if File.exists?(config_path)
   CONFIG = YAML.load_file(config_path)
-  env = ENV['RACK_ENV'] || 'development'
+  env = ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
   if env == 'production'
     set :static_cache_control, [:public, :max_age => 300]
     set :sass, { :style => :compressed }
@@ -96,7 +96,7 @@ class Exercise < ActiveRecord::Base
     })
   else
     establish_connection(CONFIG['DATABASE_PARAMS'][
-      "student_checklist_#{ENV['RACK_ENV'] || 'development'}"])
+      "student_checklist_#{ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'}"])
   end
 end
 
