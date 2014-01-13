@@ -1,8 +1,5 @@
 set :stage, :local
 
-set :user, 'deployer'
-set :use_sudo, false
-
 role :app, '192.168.33.10'
 role :web, '192.168.33.10'
 role :db,  '192.168.33.10', primary: true

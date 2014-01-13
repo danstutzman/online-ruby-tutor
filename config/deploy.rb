@@ -14,6 +14,9 @@ set :rails_env, 'production'
 
 set :normalize_asset_timestamps, false
 
+set :user, 'deployer'
+set :use_sudo, false
+
 set :bundle_cmd, '/opt/rbenv/shims/bundle'
 #set :bundle_flags, '--deployment --quiet --binstubs --shebang ruby-local-exec'
 
