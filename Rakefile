@@ -8,7 +8,7 @@ namespace "db" do
     config_path = File.join(File.dirname(__FILE__), 'config.yaml')
     if File.exists?(config_path)
       CONFIG = YAML.load_file(config_path)
-      env = ENV['RACK_ENV'] || 'development'
+      env = ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
       db_params = CONFIG['DATABASE_PARAMS'][env]
       ActiveRecord::Base.establish_connection(db_params)
     elsif ENV['DATABASE_URL'] # for Heroku
