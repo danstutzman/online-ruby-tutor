@@ -20,7 +20,7 @@ template "/home/#{node['online-ruby-tutor']['user']}/.ssh/authorized_keys" do
   owner  node['online-ruby-tutor']['user']
   group  node['online-ruby-tutor']['group']
   mode  '0600'
-  variables :keys => data_bag_item('users', 'deploy')["ssh_keys"]
+  variables :keys => data_bag_item('users', 'online-ruby-tutor')["ssh_keys"]
 end
 
 #file "/home/#{node['online-ruby-tutor']['user']}/.ssh/authorized_keys" do
