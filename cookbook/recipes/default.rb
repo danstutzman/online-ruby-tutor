@@ -23,6 +23,12 @@ template "/home/#{node['online-ruby-tutor']['user']}/.ssh/authorized_keys" do
   variables :keys => data_bag_item('users', 'online-ruby-tutor')["ssh_keys"]
 end
 
+sudo 'deployer-thin' do
+  user      "%#{node['online-ruby-tutor']['user']}"
+  commands  ['/usr/sbin/service thin *']
+  nopasswd  true
+end
+
 #file "/home/#{node['online-ruby-tutor']['user']}/.ssh/authorized_keys" do
 #  owner  node['online-ruby-tutor']['user']
 #  group  node['online-ruby-tutor']['group']

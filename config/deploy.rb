@@ -56,18 +56,18 @@ set :deploy_via, :remote_cache
 namespace :deploy do
   desc "Start the Thin processes"
   task :start do
-    run "service thin start"
+    run "sudo service thin start"
   end
 
   desc "Stop the Thin processes"
   task :stop do
-    run "service thin stop"
+    run "sudo service thin stop"
   end
 
   desc "Restart the Thin processes"
   task :restart do
-    run "service thin stop >/dev/null"
-    run "service thin start"
+    run "sudo service thin stop >/dev/null"
+    run "sudo service thin start"
   end
 end
 
