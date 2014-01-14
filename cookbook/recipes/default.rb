@@ -129,3 +129,31 @@ end
 apt_package 'nodejs' do
   action :install
 end
+
+rbenv_gem 'thin' do
+  ruby_version node['online-ruby-tutor']['ruby_version']
+end
+
+execute 'thin install' do
+  cwd '/var/www/online-ruby-tutor/current'
+end
+
+template "/etc/thin/online-ruby-tutor.yml" do
+  source 'thin.yml.erb'
+  owner  node['online-ruby-tutor']['user']
+  group  node['online-ruby-tutor']['group']
+  mode  '0644'
+  variables({
+    :dir => '/var/www/online-ruby-tutor/current',
+    :environment => 'production',
+    :port => 3004,
+  })
+  notifies :restart, 'service[thin]', :delayed
+end
+
+execute '/usr/sbin/update-rc.d -f thin defaults' do
+end
+
+service 'thin' do
+  action :start
+end
