@@ -56,17 +56,18 @@ set :deploy_via, :remote_cache
 namespace :deploy do
   desc "Start the Thin processes"
   task :start do
-    run "cd #{current_path}; RACK_ENV=#{rails_env} RAILS_ENV=#{rails_env} /opt/rbenv/shims/bundle exec thin start -p 3004 -e production -d"
+    run "service thin start"
   end
 
   desc "Stop the Thin processes"
   task :stop do
-    run "cd #{current_path}; RACK_ENV=#{rails_env} RAILS_ENV=#{rails_env} /opt/rbenv/shims/bundle exec thin stop -p 3004 -e production -d"
+    run "service thin stop"
   end
 
   desc "Restart the Thin processes"
   task :restart do
-    run "cd #{current_path}; RACK_ENV=#{rails_env} RAILS_ENV=#{rails_env} /opt/rbenv/shims/bundle exec thin restart -p 3004 -e production -d"
+    run "service thin stop >/dev/null"
+    run "service thin start"
   end
 end
 

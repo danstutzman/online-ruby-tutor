@@ -134,8 +134,7 @@ rbenv_gem 'thin' do
   ruby_version node['online-ruby-tutor']['ruby_version']
 end
 
-execute 'thin install' do
-  cwd '/var/www/online-ruby-tutor/current'
+execute '/opt/rbenv/versions/1.9.3-p448/bin/thin install' do
 end
 
 template "/etc/thin/online-ruby-tutor.yml" do
