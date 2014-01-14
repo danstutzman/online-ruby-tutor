@@ -10,11 +10,11 @@ DATABASE_PARAMS:
     adapter: sqlite3
     database: database.sqlite3
   production:
-    host:     localhost
+    host:     <%= node['online-ruby-tutor']['database']['host'].inspect %>
     adapter:  postgresql
-    username: online_ruby_tutor
-    password: online_ruby_tutor
-    database: online_ruby_tutor
+    username: <%= node['online-ruby-tutor']['database']['username'].inspect %>
+    password: <%= node['online-ruby-tutor']['database']['password'].inspect %>
+    database: <%= node['online-ruby-tutor']['database']['database'].inspect %>
     encoding: unicode
   student_checklist_development:
     adapter: sqlite3
