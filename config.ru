@@ -10,4 +10,4 @@ end
 
 require './web-app.rb'
 
-run Sinatra::Application
+run App

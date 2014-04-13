@@ -1,17 +1,31 @@
-require 'sinatra'
+require 'tilt'
+require 'sinatra/base'
 require 'json'
-require 'omniauth'
-require 'omniauth-google-oauth2'
 require 'yaml'
 require 'erubis'
-require 'tilt'
 require 'sass'
 require 'haml'
 require 'coffee_script'
 require 'active_record'
 require 'airbrake'
 require 'net/http'
+require 'logger'
+require 'sinatra/asset_snack'
 require './get_trace_for.rb'
+
+class User < ActiveRecord::Base
+end
+
+class Save < ActiveRecord::Base
+end
+
+class RootSave < ActiveRecord::Base
+end
+
+class Exercise < ActiveRecord::Base
+end
+
+class App < Sinatra::Base
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
 if File.exists?(config_path)
@@ -56,64 +70,22 @@ else # for Heroku, which doesn't support creating config.yaml
   })
 end
 
+STUDENT_CHECKLIST_HOSTNAME = CONFIG['STUDENT_CHECKLIST_HOSTNAME'][env]
+
 set :public_folder, 'public'
 set :haml, { :format => :html5, :escape_html => true, :ugly => true }
 
-STUDENT_CHECKLIST_HOSTNAME = CONFIG['STUDENT_CHECKLIST_HOSTNAME'][env]
+
+register Sinatra::AssetSnack
 
 use Rack::Session::Cookie, {
   :key => 'rack.session',
   :secret => CONFIG['COOKIE_SIGNING_SECRET'],
 }
 
-if CONFIG['GOOGLE_KEY']
-  use OmniAuth::Builder do
-    provider :google_oauth2, CONFIG['GOOGLE_KEY'], CONFIG['GOOGLE_SECRET'], {
-      :scope => 'https://www.googleapis.com/auth/plus.me',
-      :access_type => 'online',
-    }
-  end
-end
-
 use Airbrake::Sinatra
 
-class User < ActiveRecord::Base
-end
-
-class Save < ActiveRecord::Base
-end
-
-class RootSave < ActiveRecord::Base
-end
-
-class Exercise < ActiveRecord::Base
-  if ENV['STUDENT_CHECKLIST_DATABASE_URL'] # Heroku
-    db = URI.parse(ENV['STUDENT_CHECKLIST_DATABASE_URL'])
-    establish_connection({
-      :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
-      :host     => db.host,
-      :port     => db.port,
-      :username => db.user,
-      :password => db.password,
-      :database => db.path[1..-1],
-      :encoding => 'utf8',
-    })
-  else
-    establish_connection(CONFIG['DATABASE_PARAMS'][
-      "student_checklist_#{ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'}"])
-  end
-end
-
-def authenticated?
-  if session[:google_plus_user_id]
-    @current_user =
-      User.find_by_google_plus_user_id(session[:google_plus_user_id])
-  else
-    @current_user = nil
-  end
-end
-
-def match(path, opts={}, &block)
+def self.match(path, opts={}, &block)
   get(path, opts, &block)
   post(path, opts, &block)
 end
@@ -224,44 +196,15 @@ post '/' do
   haml :index
 end
 
-# Example callback:
-#
-# {"provider"=>"google_oauth2",
-#  "uid"=>"112826277336975923063",
-#  "info"=>{},
-#  "credentials"=>
-#   {"token"=>"ya29.AHES6ZRDLUipo8HB5wLy7MoO81vjath9i7Wx-4nI-duhXyE",
-#    "expires_at"=>1363146592,
-#    "expires"=>true},
-#  "extra"=>{"raw_info"=>{"id"=>"112826277336975923063"}}}
-#
-get '/auth/google_oauth2/callback' do
-  response = request.env['omniauth.auth']
-  uid = response['uid']
-  session[:google_plus_user_id] = uid
-  if authenticated?
-    original_destination = session[:original_destination]
-    session[:original_destination] = nil
-    redirect original_destination || "/"
-  else
-    session[:google_plus_user_id] = nil
-    redirect "/auth/failure?message=Sorry,+you're+not+on+the+list.+Contact+dtstutz@gmail.com+to+be+added."
-  end
-end
-
-get '/auth/failure' do
-  @auth_failure_message = params['message']
-  haml :login
-end
-
 get '/login' do
   haml :login
 end
 
 match '/exercise/:task_id' do |task_id|
-  if !authenticated?
-    session[:original_destination] = request.path_info
-    redirect '/login'
+  current_user = User.find_by(id: session[:user_id])
+  if current_user.nil?
+    current_user = User.create!
+    session[:user_id] = current_user.id
   end
 
   if params['logout']
@@ -281,7 +224,7 @@ match '/exercise/:task_id' do |task_id|
   if request.get?
     old_record =
       Save.where({
-        :user_id     => @current_user.id,
+        :user_id     => current_user.id,
         :task_id     => task_id,
         :is_current  => true
       }).first
@@ -294,13 +237,13 @@ match '/exercise/:task_id' do |task_id|
     if params['action'] == 'save'
       @user_code = params['user_code_textarea']
       Save.transaction do
-        Save.update_all("is_current = 'f'", {
-          :user_id      => @current_user.id,
+        Save.where("is_current = 'f'").update_all({
+          :user_id      => current_user.id,
           :task_id      => task_id,
           :is_current   => true
         })
         Save.create({
-          :user_id      => @current_user.id,
+          :user_id      => current_user.id,
           :task_id      => task_id,
           :is_current   => true,
           :code         => @user_code,
@@ -308,7 +251,7 @@ match '/exercise/:task_id' do |task_id|
       end
     elsif params['action'] == 'restore'
       Save.where({
-        :user_id      => @current_user.id,
+        :user_id      => current_user.id,
         :task_id      => task_id,
         :is_current   => true
       }).update_all(:is_current => false)
@@ -341,20 +284,6 @@ match '/exercise/:task_id' do |task_id|
                        trace['test_status'] == 'ERROR'
   end
 
-  if (task_id[0] == 'C' && num_passed > 0 && num_failed == 0) ||
-     (task_id[0] == 'D')
-    uri = URI.parse("http://#{STUDENT_CHECKLIST_HOSTNAME}/mark_task_complete")
-    data = {
-      'google_plus_user_id' => @current_user.google_plus_user_id,
-      'task_id'             => task_id,
-    }
-    begin
-      Net::HTTP.post_form(uri, data)
-    rescue Errno::ECONNREFUSED => e
-      # Heroku apparently doesn't allow this
-    end
-  end
-
   @methods = load_methods
   @word_to_method_indexes = load_word_to_method_indexes(@methods)
   @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
@@ -367,60 +296,19 @@ get '/css/application.css' do
   sass 'sass/application'.intern
 end
 
-get '/js/application.js' do
-  coffee 'coffee/application'.intern
+asset_map '/js/application.js', ['views/coffee/application.coffee']
+
+get '/js/:filename.js' do
+  filename = params['filename'] + '.js'
+  send_file "public/js/#{filename}"
 end
 
-get '/users' do
-  if !authenticated?
-    session[:original_destination] = request.path_info
-    redirect '/login'
-  elsif !@current_user.is_admin
-    redirect '/auth/failure?message=You+must+be+an+admin+to+edit+users'
-  end
-
-  @users = User.order('id')
-  haml :users
-end
-
-post '/users' do
-  if !authenticated?
-    session[:original_destination] = request.path_info
-    redirect '/login'
-  elsif !@current_user.is_admin
-    redirect '/auth/failure?message=You+must+be+an+admin+to+edit+users'
-  end
-
-  fields = %w[id first_name last_name google_plus_user_id is_admin email]
-
-  User.transaction do
-    User.order('id').each do |user|
-      fields.each do |field|
-        user[field] = params["#{field}_#{user.id}"]
-      end
-      user['google_plus_user_id'] = nil if user['google_plus_user_id'] == ''
-      user.save!
-    end
-
-    if (params["first_name_"] || '') != ''
-      user = User.new
-      fields.each do |field|
-        user[field] = params["#{field}_"]
-      end
-      user['google_plus_user_id'] = nil if user['google_plus_user_id'] == ''
-      user.save!
-    end
-  end
-
-  redirect '/users'
+get '/images/:filename.png' do
+  filename = params['filename'] + '.png'
+  send_file "public/images/#{filename}"
 end
 
 match '/saves/:task_id' do |task_id|
-  if !authenticated?
-    session[:original_destination] = request.path_info
-    redirect '/login'
-  end
-
   @task_id = task_id
   @saves = Save.where(:is_current => true, :task_id => task_id).order(:id)
   haml :saves
@@ -434,6 +322,8 @@ end
 after do
   ActiveRecord::Base.clear_active_connections!
 end
+
+end # end class
 
 # Remove ActiveSupport's monkey-patching of const_missing, because
 # otherwise missing-constant errors turn into too-many-instruction errors.

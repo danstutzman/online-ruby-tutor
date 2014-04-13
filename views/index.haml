@@ -48,8 +48,6 @@
                   .test-status{ :class => trace['test_status'].downcase }
                     = trace['test_status']
 
-        != haml :_idea_informer
-
         .filler.filler-tall
           - if @current_user
             logged in as
@@ -133,3 +131,4 @@
         != succeed '.' do
           %a(href='http://www.pgbovine.net/') Philip Guo
 
+  != haml :_idea_informer
