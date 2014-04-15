@@ -25,3 +25,5 @@
       %a{ href: "/exercise/#{exercise.task_id}" }
         = exercise.task_id
         != truncate(YAML.load(exercise.yaml)['description'], 60).gsub(/`(.*?)`/, "<code>\\1</code>")
+
+!= haml :_idea_informer
