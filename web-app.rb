@@ -204,7 +204,8 @@ post '/' do
 end
 
 get '/welcome' do
-  @exercises = Exercise.order(:task_id_substring)
+  @exercises = Exercise.order(:task_id_substring).to_a
+  @exercises.reject! { |exercise| exercise.task_id == 'D000' }
   haml :welcome
 end
 
