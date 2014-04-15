@@ -142,6 +142,13 @@ helpers do
     js += "1: 1 };"
     js
   end
+  def truncate(string, length)
+    if string.length > length
+      string[0...length] + '...'
+    else
+      string
+    end
+  end
 end
 
 SAMPLE_CODE =
@@ -194,6 +201,11 @@ post '/' do
   @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
   @i_need_to_method_indexes = load_i_need_to_method_indexes(@methods)
   haml :index
+end
+
+get '/welcome' do
+  @exercises = Exercise.order(:task_id_substring)
+  haml :welcome
 end
 
 get '/login' do
