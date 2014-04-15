@@ -8,6 +8,96 @@ Exercise.create! \
     description: '1. Type in some Ruby code. 2. Click Save. 3. Click Debug. 4. Click Forward until program finishes. 5. Click Edit to make more changes. 6. Repeat.'
     starting_code: 'x = 42\n\nputs x'"
 
+Exercise.create! \
+  task_id: 'D001',
+  task_id_substring: '001',
+  yaml: %q{---
+    description: "Adaptation of Philip Guo's hello example"
+    starting_code: |
+      x = [1, 2, 3]
+      y = [4, 5, 6]
+      z = y
+      y = x
+      x = z
+      
+      x = [1, 2, 3] # a different [1, 2, 3] list!
+      y = x
+      x.append(4)
+      y.append(5)
+      z = [1, 2, 3, 4, 5] # a different list!
+      x.append(6)
+      y.append(7)
+      y = "hello"
+      
+      
+      def foo(lst)
+          lst.append("hello")
+          bar(lst)
+      end
+      
+      def bar(myLst)
+          p myLst
+      end
+      
+      foo(x)
+      foo(z)
+    }
+
+Exercise.create! \
+  task_id: 'D002',
+  task_id_substring: '002',
+  yaml: %q{---
+    description: "From Teaching with Python by John Zelle"
+    starting_code: |
+      def happy()
+          puts("Happy Birthday to you!")
+      end
+      
+      def sing(name)
+          happy()
+          happy()
+          puts("Happy Birthday dear " + name + "!")
+          happy()
+      end
+      
+      # main
+      sing("Fred")
+    }
+
+Exercise.create! \
+  task_id: 'D003',
+  task_id_substring: '003',
+  yaml: %q{---
+    description: "Adapted from Philip Guo's tokenize example"
+    starting_code: |
+      input = 'John,Doe,1984,4,1,male'
+      
+      tokens = input.split(',')
+      firstName = tokens[0]
+      lastName = tokens[1]
+      birthdate = [tokens[2].to_i, tokens[3].to_i, tokens[4].to_i]
+      isMale = (tokens[5] == 'male')
+      
+      puts "Hi #{firstName} #{lastName}"
+    }
+
+Exercise.create! \
+  task_id: 'D004',
+  task_id_substring: '004',
+  yaml: %q{---
+    description: "Recursive factorial example"
+    starting_code: |
+      def fact(n)
+          if n <= 1
+              return 1
+          else
+              return n * fact(n - 1)
+          end
+      end
+      
+      puts fact(6)
+    }
+
 Exercise.create! task_id: "D014", task_id_substring: "014", yaml: "---\ndescription: ! ' Example of a variable (`x`) being provided with a test case'\n\nstarting_code: \"puts x\"\ncases:\n- given: { x: 4 }\n- given: { x: 5 }"
 Exercise.create! task_id: "C015", task_id_substring: "015", yaml: "---\ndescription: ! ' Print out 1, 2, and 3 on separate lines'\n\ncases:\n- expected_stdout: \"1\\n2\\n3\""
 Exercise.create! task_id: "D018", task_id_substring: "018", yaml: "---\ndescription: ! ' Example of arithmetic'\n\nstarting_code: \"puts 17 * 31\""

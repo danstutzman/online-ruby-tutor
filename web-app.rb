@@ -166,8 +166,13 @@ puts binary_search([4, 9, 12, 13, 17, 18], 17)
 "
 
 get '/' do
-  @exercises = Exercise.order(:task_id_substring).to_a
-  @exercises.reject! { |exercise| exercise.task_id == 'D000' }
+  exercises = Exercise.order(:task_id_substring).to_a
+  @exercises1 = exercises.select do |e|
+    e.task_id != 'D000' && e.task_id_substring.to_i < 14
+  end
+  @exercises2 = exercises.select do |e|
+    e.task_id_substring.to_i >= 14
+  end
   haml :welcome
 end
 

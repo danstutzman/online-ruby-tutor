@@ -16,8 +16,10 @@
 
     %h2 1. Trace some examples
     %ul
-      %li here
-      %li here
+      - @exercises1.each do |exercise|
+        %li
+          %a{ href: "/exercise/#{exercise.task_id}" }
+            != YAML.load(exercise.yaml)['description']
 
     %h2 2. Trace your own program
     %ul
@@ -31,7 +33,7 @@
         %br
         C means a challenge: you need to fix the code to make the tests pass.
     %ul
-      - @exercises.each do |exercise|
+      - @exercises2.each do |exercise|
         %li
           %a{ href: "/exercise/#{exercise.task_id}" }
             = exercise.task_id
