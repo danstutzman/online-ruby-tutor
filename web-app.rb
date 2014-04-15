@@ -166,44 +166,6 @@ puts binary_search([4, 9, 12, 13, 17, 18], 17)
 "
 
 get '/' do
-  if session[:root_save_id]
-    @user_code = RootSave.find(session[:root_save_id]).code || ''
-  end
-  if @user_code.nil? || @user_code == ''
-    @user_code = SAMPLE_CODE
-  end
-  @traces = get_trace_for_cases('', @user_code, [{}])
-  @methods = load_methods
-  @word_to_method_indexes = load_word_to_method_indexes(@methods)
-  @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
-  @i_need_to_method_indexes = load_i_need_to_method_indexes(@methods)
-  haml :index
-end
-
-post '/' do
-  if params['logout']
-    session[:google_plus_user_id] = nil
-    redirect '/'
-  end
-  @user_code = params['user_code_textarea']
-  if session[:root_save_id]
-    RootSave.update_all("is_current = 'f'", { id: session[:root_save_id] })
-  end
-  new_root_save = RootSave.create({
-    :user_id      => @current_user ? @current_user.id : nil,
-    :is_current   => true,
-    :code         => @user_code,
-  })
-  session[:root_save_id] = new_root_save.id
-  @traces = get_trace_for_cases('', @user_code, [{}])
-  @methods = load_methods
-  @word_to_method_indexes = load_word_to_method_indexes(@methods)
-  @i_have_to_method_indexes = load_i_have_to_method_indexes(@methods)
-  @i_need_to_method_indexes = load_i_need_to_method_indexes(@methods)
-  haml :index
-end
-
-get '/welcome' do
   @exercises = Exercise.order(:task_id_substring).to_a
   @exercises.reject! { |exercise| exercise.task_id == 'D000' }
   haml :welcome
