@@ -25,6 +25,10 @@ end
 class Exercise < ActiveRecord::Base
 end
 
+class ExerciseGroup < ActiveRecord::Base
+  has_many :exercises, -> { order :task_id_substring, :id }
+end
+
 class App < Sinatra::Base
 
 config_path = File.join(File.dirname(__FILE__), 'config.yaml')
@@ -143,8 +147,10 @@ helpers do
     js
   end
   def truncate(string, length)
+    without_html = string.gsub(/`/, '').gsub('"', '&quot;')
     if string.length > length
-      string[0...length] + '...'
+      truncated = string[0...length]
+      "<span title=\"#{without_html}\">#{truncated}...</span>"
     else
       string
     end
@@ -166,13 +172,10 @@ puts binary_search([4, 9, 12, 13, 17, 18], 17)
 "
 
 get '/' do
-  exercises = Exercise.order(:task_id_substring).to_a
-  @exercises1 = exercises.select do |e|
-    e.task_id != 'D000' && e.task_id_substring.to_i < 14
-  end
-  @exercises2 = exercises.select do |e|
-    e.task_id_substring.to_i >= 14
-  end
+  @exercise_group1 = ExerciseGroup.find(1)
+  @exercise_group2 = ExerciseGroup.find(2)
+  @other_exercise_groups =
+    ExerciseGroup.order(:id).to_a.reject { |group| group.id < 3 }
   haml :welcome
 end
 
